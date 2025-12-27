@@ -2,6 +2,7 @@
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_keycode.h>
 #include <SDL3/SDL_oldnames.h>
+#include <SDL3/SDL_pixels.h>
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_scancode.h>
@@ -12,6 +13,9 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
+#include <SDLWrapper/DrawTransformObjects/RectangleShape.hpp>
+#include <SDLWrapper/DrawTransformObjects/CircleShape.hpp>
+#include <SDLWrapper/DrawTransformObjects/EllipseShape.hpp>
 #include <SDLWrapper/DrawTransformObjects/Sprite.hpp>
 #include <SDLWrapper/Renders/RenderWindow.hpp>
 
@@ -19,6 +23,9 @@ sdl3::RenderWindow window;
 sdl3::Sprite sprite1;
 sdl3::Sprite sprite2;
 sdl3::Texture texture;
+sdl3::RectangleShape rect;
+sdl3::CircleShape circ;
+sdl3::EllipseShape elip;
 sdl3::View view;
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
@@ -38,6 +45,24 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
     sprite2.setTexture(texture);
     sprite2.setCenterPosition({100, 100});
+
+    rect.setSize({200.f, 120.f});
+    rect.setFillColor(SDL_FColor{1,0,0,255});
+    // rect.setTexture(texture);
+    rect.setPosition({300.f, 200.f});
+    rect.setUniformScale(2);
+    rect.setRotation(-45);
+
+    circ.setRadius(50);
+    circ.setTexture(texture);
+    circ.setPosition({500, 200});
+    circ.setOutlineColor(SDL_FColor{0, 1, 0, 1});
+    circ.setOutlineThickness(10);
+    circ.setPointCount(6);
+
+    elip.setPosition({600,300});
+    elip.setRadii({50, 70});
+    elip.setFillColor(SDL_FColor{0, 0, 1, 1});
 
     view = window.getView();
 
@@ -132,6 +157,9 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     window.clear(SDL_Color{255,255,255,255});
     window.draw(sprite1);
     window.draw(sprite2);
+    window.draw(rect);
+    window.draw(circ);
+    window.draw(elip);
     window.display();
     return SDL_APP_CONTINUE;
 }

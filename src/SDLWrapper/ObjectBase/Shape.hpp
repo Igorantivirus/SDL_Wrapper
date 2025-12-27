@@ -5,6 +5,8 @@
 
 #include <SDL3/SDL.h>
 
+
+#include <SDLWrapper/Renders/RenderTarget.hpp>
 #include "Drawable.hpp"
 #include "SDLWrapper/Texture.hpp"
 #include "Transformable.hpp"

@@ -2,25 +2,32 @@
 
 #include <cstddef>
 #include <cmath>
+
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_stdinc.h>
+
 #include <SDLWrapper/ObjectBase/Shape.hpp>
 
 namespace sdl3
 {
-class CircleShape : public Shape
+class EllipseShape : public Shape
 {
 public:
-    CircleShape(float radius = 0.0f, std::size_t pointCount = 20)
-        : radius_(radius), pointCount_(pointCount)
+    EllipseShape(const SDL_FPoint &radii = {0.0f, 0.0f}, std::size_t pointCount = 40)
+        : radii_{radii}, pointCount_(pointCount)
     {
         update();
     }
 
-    void setRadius(float radius)
+    void setRadii(const SDL_FPoint &radii)
     {
-        radius_ = radius;
+        radii_ = radii;
         update();
+    }
+
+    const SDL_FPoint &getRadii() const
+    {
+        return radii_;
     }
 
     void setPointCount(std::size_t pointCount)
@@ -38,13 +45,12 @@ public:
     {
         const float angle = static_cast<float>(index) * 2.0f * SDL_PI_F / static_cast<float>(pointCount_);
         return {
-            radius_ * std::cos(angle),
-            radius_ * std::sin(angle)};
+            radii_.x * std::cos(angle),
+            radii_.y * std::sin(angle)};
     }
 
 private:
-    float radius_;
+    SDL_FPoint radii_{0.0f, 0.0f};
     std::size_t pointCount_;
 };
-
 } // namespace sdl3
