@@ -1,0 +1,16 @@
+#; CompileFlags:
+#;   Add: ["-fno-builtin-m_prefetch", "-mno-3dnow"]
+#;   CompilationDatabase: build
+#; Clangd:
+#;   Arguments:
+#;     - "--query-driver=C:/Program Files/LLVM/bin/clang*.exe;C:/Program Files/Microsoft Visual Studio/*/VC/Tools/MSVC/*/bin/Hostx64/x64/cl.exe"
+
+
+
+CompileFlags:
+  CompilationDatabase: build
+  Remove: ['-std=*', '/std:*']
+  Add: ['/std:c++latest', '/Zc:__cplusplus', '/EHsc']
+
+Diagnostics:
+  Suppress: ['builtin_definition']

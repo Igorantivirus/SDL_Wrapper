@@ -1,0 +1,17 @@
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+
+########################Link FreeType###############################
+set(FT_DISABLE_BZIP2    ON                CACHE BOOL "" FORCE)
+set(FT_DISABLE_BROTLI   ON                CACHE BOOL "" FORCE)
+set(FT_DISABLE_HARFBUZZ ON                CACHE BOOL "" FORCE)
+set(FT_DISABLE_PNG      ON                CACHE BOOL "" FORCE)
+set(CMAKE_DISABLE_FIND_PACKAGE_ZLIB TRUE  CACHE BOOL "" FORCE)
+set(CMAKE_DISABLE_FIND_PACKAGE_PNG  TRUE  CACHE BOOL "" FORCE)
+
+
+########################Link RmlUi###############################
+set(RMLUI_SAMPLES        OFF CACHE BOOL "" FORCE)
+set(BUILD_TESTING        OFF CACHE BOOL "" FORCE)
+set(RMLUI_LUA_BINDINGS   OFF CACHE BOOL "" FORCE)
+set(RMLUI_SVG_PLUGIN     OFF CACHE BOOL "" FORCE)
+set(RMLUI_LOTTIE_PLUGIN  OFF CACHE BOOL "" FORCE)
