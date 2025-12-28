@@ -3,7 +3,6 @@
 #include <SDL3/SDL_oldnames.h>
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_stdinc.h>
-#include <cmath>
 #include <memory>
 #include <vector>
 
@@ -23,10 +22,16 @@ class RenderTarget
 {
 public:
     virtual ~RenderTarget() = default;
+    
 
     void draw(const Drawable &object)
     {
         object.draw(*this);
+    }
+
+    void debug()
+    {
+        SDL_SetRenderScale(renderer_.get(), 2, 2);
     }
 
     void drawTexture(const Texture &texture, const Transformable &tr, const SDL_FRect &srcRect)
@@ -74,38 +79,10 @@ public:
         SDL_RenderTextureRotated(renderer_.get(), sdlTex, &srcRect, &dst, angle, &center, SDL_FLIP_NONE);
     }
 
-    void drawShape(const std::vector<SDL_Vertex> &fillVertices, const std::vector<SDL_Vertex> &outlineVertices, const Transformable &transform, const Texture *texture)
+    void drawShape(const std::vector<SDL_Vertex> &fillVertices, const std::vector<SDL_Vertex> &outlineVertices, const Texture *texture)
     {
         if (!renderer_)
             return;
-
-        auto transformVertex = [&transform](const SDL_Vertex &src) -> SDL_Vertex
-        {
-            SDL_Vertex out = src;
-
-            SDL_FPoint p = src.position;
-            const SDL_FPoint origin = transform.getOrigin();
-            const SDL_FPoint scale = transform.getScale();
-            const float rotation = transform.getRotation();
-            const SDL_FPoint pos = transform.getPosition();
-
-            p.x -= origin.x;
-            p.y -= origin.y;
-
-            p.x *= scale.x;
-            p.y *= scale.y;
-
-            const float rad = -rotation * SDL_PI_F / 180.0f;
-            const float c = std::cos(rad);
-            const float s = std::sin(rad);
-
-            const float rx = p.x * c - p.y * s;
-            const float ry = p.x * s + p.y * c;
-
-            out.position.x = rx + pos.x;
-            out.position.y = ry + pos.y;
-            return out;
-        };
 
         const SDL_Texture *sdlTex = nullptr;
         if (texture)
@@ -117,22 +94,12 @@ public:
 
         if (!fillVertices.empty())
         {
-            std::vector<SDL_Vertex> transformed;
-            transformed.reserve(fillVertices.size());
-            for (const auto &v : fillVertices)
-                transformed.push_back(transformVertex(v));
-
-            SDL_RenderGeometry(renderer_.get(), const_cast<SDL_Texture *>(sdlTex), transformed.data(), static_cast<int>(transformed.size()), nullptr, 0);
+            SDL_RenderGeometry(renderer_.get(), const_cast<SDL_Texture *>(sdlTex), fillVertices.data(), static_cast<int>(fillVertices.size()), nullptr, 0);
         }
 
         if (!outlineVertices.empty())
         {
-            std::vector<SDL_Vertex> transformed;
-            transformed.reserve(outlineVertices.size());
-            for (const auto &v : outlineVertices)
-                transformed.push_back(transformVertex(v));
-
-            SDL_RenderGeometry(renderer_.get(), nullptr, transformed.data(), static_cast<int>(transformed.size()), nullptr, 0);
+            SDL_RenderGeometry(renderer_.get(), nullptr, outlineVertices.data(), static_cast<int>(outlineVertices.size()), nullptr, 0);
         }
     }
 

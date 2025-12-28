@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SDL3/SDL_pixels.h>
 #include <cmath>
 #include <vector>
 
@@ -125,11 +126,12 @@ public:
     virtual SDL_FPoint getPoint(size_t index) const = 0;
 
     // Метод отрисовки (Double Dispatch)
-    void draw(RenderTarget &target) const
+    void draw(RenderTarget &target) const override
     {
         // Double dispatch: делегируем отрисовку RenderTarget,
         // передавая ему нашу геометрию и трансформацию
-        target.drawShape(vertices_, outlineVertices_, *this, texture_);
+        updateTransformed();
+        target.drawShape(transformedVertices_, transformedOutlineVertices_, texture_);
     }
 
 protected:
@@ -152,6 +154,7 @@ protected:
         updateOutlineColors();
         updateTexCoords();
         bounds_.w = -1; // Инвалидируем кэш bounds
+        transformDirty_ = true;
     }
 
     const Texture *texture_ = nullptr;
@@ -167,6 +170,9 @@ protected:
 
 private:
     mutable SDL_FRect bounds_; // Кэш для getLocalBounds()
+    mutable bool transformDirty_ = true;
+    mutable std::vector<SDL_Vertex> transformedVertices_;
+    mutable std::vector<SDL_Vertex> transformedOutlineVertices_;
 
     // ============ Внутренние методы обновления ============
 
@@ -219,6 +225,7 @@ private:
         {
             v.color = fillColor_;
         }
+        transformDirty_ = true;
     }
 
     /**
@@ -227,7 +234,7 @@ private:
     void buildOutline()
     {
         outlineVertices_.clear();
-
+        
         if (outlineThickness_ <= 0.0f)
             return;
 
@@ -303,6 +310,7 @@ private:
         {
             v.color = outlineColor_;
         }
+        transformDirty_ = true;
     }
 
     /**
@@ -318,6 +326,7 @@ private:
             {
                 v.tex_coord = {0, 0};
             }
+            transformDirty_ = true;
             return;
         }
 
@@ -334,6 +343,7 @@ private:
             v.tex_coord.x = (textureRect_.x + u * textureRect_.w) / texSize.x;
             v.tex_coord.y = (textureRect_.y + v_coord * textureRect_.h) / texSize.y;
         }
+        transformDirty_ = true;
 
         // Outline обычно без текстуры, но можно добавить логику
     }
@@ -375,6 +385,54 @@ private:
         float dy = p2.y - p1.y;
         // Перпендикуляр (поворот на 90° против часовой)
         return {-dy, dx};
+    }
+
+private:
+    void onTransformChanged() override
+    {
+        transformDirty_ = true;
+    }
+
+    void updateTransformed() const
+    {
+        if (!transformDirty_)
+            return;
+
+        const SDL_FPoint origin = getOrigin();
+        const SDL_FPoint scale = getScale();
+        const float rotation = getRotation();
+        const SDL_FPoint pos = getPosition();
+
+        const float rad = -rotation * SDL_PI_F / 180.0f;
+        const float c = std::cos(rad);
+        const float s = std::sin(rad);
+
+        auto applyTransform = [&](const SDL_Vertex &src, SDL_Vertex &dst)
+        {
+            SDL_FPoint p = src.position;
+            p.x -= origin.x;
+            p.y -= origin.y;
+
+            p.x *= scale.x;
+            p.y *= scale.y;
+
+            const float rx = p.x * c - p.y * s;
+            const float ry = p.x * s + p.y * c;
+
+            dst = src;
+            dst.position.x = rx + pos.x;
+            dst.position.y = ry + pos.y;
+        };
+
+        transformedVertices_.resize(vertices_.size());
+        for (std::size_t i = 0; i < vertices_.size(); ++i)
+            applyTransform(vertices_[i], transformedVertices_[i]);
+
+        transformedOutlineVertices_.resize(outlineVertices_.size());
+        for (std::size_t i = 0; i < outlineVertices_.size(); ++i)
+            applyTransform(outlineVertices_[i], transformedOutlineVertices_[i]);
+
+        transformDirty_ = false;
     }
 };
 
