@@ -231,6 +231,8 @@ private:
 
     mutable std::vector<SDL_Vertex> vertices_;
     mutable std::vector<SDL_Vertex> outlineVertices_;
+    mutable std::vector<SDL_Vertex> viewVertices_;
+    mutable std::vector<SDL_Vertex> viewOutlineVertices_;
     mutable bool shapeDirty_ = true;
     mutable bool outlineDirty_ = true;
     mutable unsigned viewId_ = 0; // С этим работа позже, пока не трогать
@@ -238,13 +240,38 @@ private:
 private:
     void draw(RenderTarget &target) const override
     {
-        if (shapeDirty_)
+        if (m_dirty || shapeDirty_)
             updateVertices();
-        if (outlineDirty_)
+        if (m_dirty || outlineDirty_)
             updateOutlineVertices();
         // Всё передатся по обычной ссылке
         // Там провериться, совпадает ли ID view текущая и у вида окна и при несовпадении массивы обновятся (домножаться на матрицу) и обновится ID.
-        target.drawShape(vertices_, outlineVertices_, texture_, viewId_);
+        const unsigned targetViewId = target.getViewId();
+        if (viewId_ != targetViewId)
+        {
+            viewVertices_ = vertices_;
+            viewOutlineVertices_ = outlineVertices_;
+
+            const Matrix3x3 viewMatrix = target.getView().getTransformMatrix();
+            const SDL_FPoint screenCenter = target.getTargetCenter();
+
+            for (auto &vert : viewVertices_)
+            {
+                vert = viewMatrix.transform(vert);
+                vert.position.x += screenCenter.x;
+                vert.position.y += screenCenter.y;
+            }
+            for (auto &vert : viewOutlineVertices_)
+            {
+                vert = viewMatrix.transform(vert);
+                vert.position.x += screenCenter.x;
+                vert.position.y += screenCenter.y;
+            }
+
+            viewId_ = targetViewId;
+        }
+
+        target.drawShape(viewVertices_, viewOutlineVertices_, texture_, viewId_);
     }
 
     void updateLocalBounds()
@@ -269,13 +296,17 @@ private:
     }
     void updateFillColors()
     {
+        for (auto &v : localVertices_)
+            v.color = fillColor_;
         for (auto &v : vertices_)
             v.color = fillColor_;
     }
     void updateOutlineColors()
     {
+        for (auto &v : localOutlineVertices_)
+            v.color = outlineColor_;
         for (auto &v : outlineVertices_)
-            v.color = fillColor_;
+            v.color = outlineColor_;
     }
     void updateTexturePoints()
     {
@@ -288,6 +319,11 @@ private:
         };
         for (size_t i = 0; i < localVertices_.size(); ++i)
             localVertices_[i].tex_coord = updateTexCoord(localVertices_[i]);
+        if (vertices_.size() == localVertices_.size())
+        {
+            for (size_t i = 0; i < vertices_.size(); ++i)
+                vertices_[i].tex_coord = localVertices_[i].tex_coord;
+        }
     }
 
     void updateVertices() const

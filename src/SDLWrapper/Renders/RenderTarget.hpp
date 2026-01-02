@@ -76,15 +76,6 @@ public:
 
     void drawShape(std::vector<SDL_Vertex> &fillVertices, std::vector<SDL_Vertex> &outlineVertices, const Texture *texture, unsigned &viewId)
     {
-        if (viewId != viewId_)
-        {
-            Matrix3x3 matrix = view_.getTransformMatrix();
-            for (auto &vert : fillVertices)
-                vert = matrix.transform(vert);
-            for (auto &vert : outlineVertices)
-                vert = matrix.transform(vert);
-            viewId = viewId_;
-        }
         if (!renderer_)
             return;
 
@@ -125,6 +116,14 @@ public:
     {
         view_ = view;
         ++viewId_;
+    }
+    unsigned getViewId() const
+    {
+        return viewId_;
+    }
+    SDL_FPoint getTargetCenter() const
+    {
+        return SDL_FPoint{targetSize_.x / 2.0f, targetSize_.y / 2.0f};
     }
 
     void clear(const SDL_Color &color = SDL_Color{0, 0, 0, 255})
