@@ -53,7 +53,7 @@ public:
     {
         window_.reset();
         renderer_.reset();
-        view_.resetView();
+        // view_.resetView();
         unsubscribe();
         isOpen_ = isFullScreen_ = false;
     }

@@ -14,19 +14,19 @@ public:
     CircleShape(float radius = 0.0f, std::size_t pointCount = 20)
         : radius_(radius), pointCount_(pointCount)
     {
-        update();
+        updateLocalGeometry();
     }
 
     void setRadius(float radius)
     {
         radius_ = radius;
-        update();
+        updateLocalGeometry();
     }
 
     void setPointCount(std::size_t pointCount)
     {
         pointCount_ = pointCount;
-        update();
+        updateLocalGeometry();
     }
 
     std::size_t getPointCount() const override

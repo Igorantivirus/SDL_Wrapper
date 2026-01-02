@@ -1,9 +1,12 @@
 #pragma once
 
+#include <SDL3/SDL_stdinc.h>
 #include <cmath>
 #include <cstdlib>
 
 #include <SDL3/SDL_rect.h>
+
+#include <SDLWrapper/Math/Matrix3x3.hpp>
 
 namespace sdl3
 {
@@ -13,13 +16,46 @@ class Transformable
 public:
     virtual ~Transformable() = default;
 
-    virtual void setPosition(const SDL_FPoint &position)
+    const Matrix3x3 &getTransformMatrix() const
     {
-        position_ = position;
-        onTransformChanged();
+        if (m_dirty)
+        {
+            float angle = rotation_ * (SDL_PI_F / 180.0f); // переводим в радианы
+            float cosA = std::cos(angle);
+            float sinA = std::sin(angle);
+
+            // Коэффициенты с учетом Scale и Rotation
+            float sxc = scale_.x * cosA;
+            float sxs = scale_.x * sinA;
+            float syc = scale_.y * cosA;
+            float sys = scale_.y * sinA;
+
+            // Матрица трансформации:
+            matrix_.a = sxc;
+            matrix_.b = sxs;
+            matrix_.c = -sys;
+            matrix_.d = syc;
+
+            // Учитываем Origin и Position (tx, ty)
+            matrix_.tx = -origin_.x * sxc + origin_.y * sys + position_.x;
+            matrix_.ty = -origin_.x * sxs - origin_.y * syc + position_.y;
+
+            m_dirty = false;
+        }
+        return matrix_;
     }
-    virtual void setOriginKeepPosition(const SDL_FPoint &newOrigin)
+
+    void setPosition(const SDL_FPoint &position)
     {
+        if(position_.x == position.x && position_.y == position.y)
+            return;
+        position_ = position;
+        m_dirty = true;
+    }
+    void setOriginKeepPosition(const SDL_FPoint &newOrigin)
+    {
+        if(origin_.x == newOrigin.x && origin_.y == newOrigin.y)
+            return;
         const float dx = (newOrigin.x - origin_.x) * scale_.x;
         const float dy = (newOrigin.y - origin_.y) * scale_.y;
 
@@ -35,78 +71,90 @@ public:
         position_.y += rdy;
 
         origin_ = newOrigin;
-        onTransformChanged();
+        m_dirty = true;
     }
     virtual void setCenterPosition(const SDL_FPoint &position)
     {
+        m_dirty = true;
     }
-    virtual void setOrigin(const SDL_FPoint &origin)
+    void setOrigin(const SDL_FPoint &origin)
     {
+        if(origin_.x == origin.x && origin_.y == origin.y)
+            return;
         origin_ = origin;
-        onTransformChanged();
+        m_dirty = true;
     }
-    virtual void setScale(const SDL_FPoint &scale)
+    void setScale(const SDL_FPoint &scale)
     {
+        if(scale_.x == scale.x && scale_.y == scale.y)
+            return;
         scale_.x = std::abs(scale.x);
         scale_.y = std::abs(scale.y);
-        isTransformed_ = isTransformedCheck();
-        onTransformChanged();
+        m_dirty = true;
     }
-    virtual void setUniformScale(float scale)
+    void setUniformScale(float scale)
     {
+        if(scale_.x == scale && scale_.y == scale)
+            return;
         float absScale = std::abs(scale);
         scale_.x = absScale;
         scale_.y = absScale;
-        isTransformed_ = isTransformedCheck();
-        onTransformChanged();
+        m_dirty = true;
     }
-    virtual void setRotation(float rotation)
+    void setRotation(float rotation)
     {
+        if(rotation == rotation_)
+            return;
         rotation_ = std::fmod(rotation, 360.0f);
-        isTransformed_ = isTransformedCheck();
-        onTransformChanged();
+        m_dirty = true;
     }
 
-    virtual void rotate(float angle)
+    void rotate(float angle)
     {
+        if(angle == 0.f)
+            return;
         setRotation(rotation_ + angle);
     }
-    virtual void move(const SDL_FPoint &offset)
+    void move(const SDL_FPoint &offset)
     {
+        if(offset.x == 0.f && offset.y == 0.f)
+            return;
         position_.x += offset.x;
         position_.y += offset.y;
-        onTransformChanged();
+        m_dirty = true;
     }
-    virtual void scale(const SDL_FPoint &factor)
+    void scale(const SDL_FPoint &factor)
     {
+        if(factor.x == 1.f && factor.y == 1.f)
+            return;
         scale_.x *= std::abs(factor.x);
         scale_.y *= std::abs(factor.y);
-        isTransformed_ = isTransformedCheck();
-        onTransformChanged();
+        m_dirty = true;
     }
 
-    virtual void uniformeScale(const float factor)
+    void uniformeScale(const float factor)
     {
+        if(factor == 1.f)
+            return;
         scale_.x *= std::abs(factor);
         scale_.y *= std::abs(factor);
-        isTransformed_ = isTransformedCheck();
-        onTransformChanged();
+        m_dirty = true;
     }
-    virtual void resetTransform()
+    void resetTransform()
     {
         position_ = {0.0f, 0.0f};
         origin_ = {0.0f, 0.0f};
         scale_ = {1.0f, 1.0f};
         rotation_ = 0.0f;
         isTransformed_ = false;
-        onTransformChanged();
+        m_dirty = true;
     }
 
     const SDL_FPoint &getPosition() const
     {
         return position_;
     }
-    virtual SDL_FPoint getCenterPosition() const
+    SDL_FPoint getCenterPosition() const
     {
         return SDL_FPoint{position_.x, position_.y};
     }
@@ -123,11 +171,6 @@ public:
         return rotation_;
     }
 
-    bool isTransformed() const
-    {
-        return isTransformed_;
-    }
-
 protected:
     SDL_FPoint position_ = {0.0f, 0.0f};
     SDL_FPoint origin_ = {0.0f, 0.0f};
@@ -135,16 +178,9 @@ protected:
     float rotation_ = 0.0f;
     bool isTransformed_ = false;
 
-protected:
-    virtual void onTransformChanged()
-    {
-    }
+    mutable Matrix3x3 matrix_;
+    mutable bool m_dirty = true;
 
-private:
-    bool isTransformedCheck() const
-    {
-        return !(scale_.x == 1.0f && scale_.y == 1.0f && rotation_ == 0.0f);
-    }
 };
 
 } // namespace sdl3

@@ -11,6 +11,7 @@
 #include <SDLWrapper/ObjectBase/Drawable.hpp>
 
 // #include "ObjectBase/Transformable.hpp"
+#include "SDLWrapper/Math/Matrix3x3.hpp"
 #include "SDLWrapper/ObjectBase/Transformable.hpp"
 #include "View.hpp"
 #include <SDLWrapper/Texture.hpp>
@@ -22,16 +23,10 @@ class RenderTarget
 {
 public:
     virtual ~RenderTarget() = default;
-    
 
     void draw(const Drawable &object)
     {
         object.draw(*this);
-    }
-
-    void debug()
-    {
-        SDL_SetRenderScale(renderer_.get(), 2, 2);
     }
 
     void drawTexture(const Texture &texture, const Transformable &tr, const SDL_FRect &srcRect)
@@ -51,7 +46,7 @@ public:
         const float sy = scale.y * zoom.y;
 
         // Экранная позиция pivot
-        SDL_FPoint screenPivot = view_.isDefault() ? pivotPos : worldToScreen(pivotPos);
+        SDL_FPoint screenPivot;// = view_.isDefault() ? pivotPos : worldToScreen(pivotPos);
 
         // Pivot внутри dstRect (в пикселях dstRect)
         SDL_FPoint center;
@@ -68,15 +63,34 @@ public:
 
         // Быстрый путь: если нет поворота и камера default, можно без Rotated,
         // но смещение по origin всё равно нужно, иначе pivot "уедет".
-        if (view_.isDefault() && rotDeg == 0.0f)
-        {
-            SDL_RenderTexture(renderer_.get(), sdlTex, &srcRect, &dst);
-            return;
-        }
+        // if (view_.isDefault() && rotDeg == 0.0f)
+        // {
+        //     SDL_RenderTexture(renderer_.get(), sdlTex, &srcRect, &dst);
+        //     return;
+        // }
 
         const double angle = double(rotDeg - view_.getAngle());
 
         SDL_RenderTextureRotated(renderer_.get(), sdlTex, &srcRect, &dst, angle, &center, SDL_FLIP_NONE);
+    }
+
+    void drawShape(std::vector<SDL_Vertex> &fillVertices, std::vector<SDL_Vertex> &outlineVertices, const Texture *texture, unsigned &viewId)
+    {
+        if (viewId != viewId_)
+        {
+            Matrix3x3 matrix = view_.getTransformMatrix();
+            for (auto &vert : fillVertices)
+                vert = matrix.transform(vert);
+            for (auto &vert : outlineVertices)
+                vert = matrix.transform(vert);
+            viewId = viewId_;
+        }
+        if (!renderer_)
+            return;
+
+        const SDL_Texture *sdlTex = getRawTextureFromTexture(texture);
+        SDL_RenderGeometry(renderer_.get(), const_cast<SDL_Texture *>(sdlTex), fillVertices.data(), static_cast<int>(fillVertices.size()), nullptr, 0);
+        SDL_RenderGeometry(renderer_.get(), nullptr, outlineVertices.data(), static_cast<int>(outlineVertices.size()), nullptr, 0);
     }
 
     void drawShape(const std::vector<SDL_Vertex> &fillVertices, const std::vector<SDL_Vertex> &outlineVertices, const Texture *texture)
@@ -110,6 +124,7 @@ public:
     void setView(const View &view)
     {
         view_ = view;
+        ++viewId_;
     }
 
     void clear(const SDL_Color &color = SDL_Color{0, 0, 0, 255})
@@ -127,11 +142,13 @@ protected:
     View view_;
     SDL_Point targetSize_{};
 
+    unsigned viewId_ = 1;
+
 protected:
     void setBaseViewPosition(const SDL_FPoint &pos)
     {
         view_.setCenterPosition(pos);
-        view_.baseCenter_ = pos;
+        // view_.setCenterPosition(const );
     }
     SDL_FPoint worldToScreen(const SDL_FPoint &worldPos) const
     {
@@ -140,13 +157,20 @@ protected:
         float relX = worldPos.x - view_.getCenterPosition().x;
         float relY = worldPos.y - view_.getCenterPosition().y;
 
-        float rotatedX = relX * view_.cosAngle_ + relY * view_.sinAngle_;
-        float rotatedY = -relX * view_.sinAngle_ + relY * view_.cosAngle_;
+        float rotatedX = 0;//relX * view_.cosAngle_ + relY * view_.sinAngle_;
+        float rotatedY = 0;//-relX * view_.sinAngle_ + relY * view_.cosAngle_;
 
         float screenX = (rotatedX * view_.getZoom().x) + (targetSize.x / 2.0f);
         float screenY = (rotatedY * view_.getZoom().y) + (targetSize.y / 2.0f);
 
         return SDL_FPoint{screenX, screenY};
+    }
+
+    const SDL_Texture *getRawTextureFromTexture(const Texture *texture)
+    {
+        if (texture)
+            return texture->getSDLTexture().lock().get();
+        return nullptr;
     }
 };
 

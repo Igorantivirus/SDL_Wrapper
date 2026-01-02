@@ -5,20 +5,23 @@
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_stdinc.h>
 
+#include <SDLWrapper/Math/Matrix3x3.hpp>
+
 namespace sdl3
 {
 
-class RenderTarget;
-
 class View
 {
-    friend class RenderTarget;
-
 public:
-    // ============ Центр ============
+    View() = default;
+
+    // ============ Центр (Точка в мире, на которую смотрим) ============
     void setCenterPosition(const SDL_FPoint &pos)
     {
+        if (center_.x == pos.x && center_.y == pos.y)
+            return;
         center_ = pos;
+        m_dirty = true;
     }
 
     const SDL_FPoint &getCenterPosition() const
@@ -26,19 +29,26 @@ public:
         return center_;
     }
 
-    // ============ Масштаб ============
+    // ============ Масштаб (Zoom) ============
     void setZoom(const SDL_FPoint &zoom)
     {
-        // Защита от отрицательного масштаба
-        zoom_.x = std::abs(zoom.x);
-        zoom_.y = std::abs(zoom.y);
+        float zx = std::abs(zoom.x);
+        float zy = std::abs(zoom.y);
+        if (zoom_.x == zx && zoom_.y == zy)
+            return;
+        zoom_.x = zx;
+        zoom_.y = zy;
+        m_dirty = true;
     }
 
     void setUniformScale(float zoom)
     {
-        float positiveScale = std::abs(zoom);
-        zoom_.x = positiveScale;
-        zoom_.y = positiveScale;
+        float z = std::abs(zoom);
+        if (zoom_.x == z && zoom_.y == z)
+            return;
+        zoom_.x = z;
+        zoom_.y = z;
+        m_dirty = true;
     }
 
     const SDL_FPoint &getZoom() const
@@ -46,15 +56,18 @@ public:
         return zoom_;
     }
 
-    // ============ Угол ============
+    // ============ Угол поворота камеры ============
     void setAngle(float degrees)
     {
-        angle_ = std::fmod(degrees, 360.0f);
+        float newAngle = std::fmod(degrees, 360.0f);
+        if (angle_ == newAngle)
+            return;
 
-        static const constexpr float TO_RAD = SDL_PI_F / 180.f;
-
-        sinAngle_ = std::sin(angle_ * TO_RAD);
-        cosAngle_ = std::cos(angle_ * TO_RAD);
+        angle_ = newAngle;
+        float radians = angle_ * (SDL_PI_F / 180.0f);
+        sinAngle_ = std::sin(radians);
+        cosAngle_ = std::cos(radians);
+        m_dirty = true;
     }
 
     float getAngle() const
@@ -62,70 +75,72 @@ public:
         return angle_;
     }
 
-    // ============ Проверка на значения по умолчанию ============
-    bool isDefault() const
-    {
-        return center_.x == baseCenter_.x && center_.y == baseCenter_.y &&
-               zoom_.x == 1.f && zoom_.y == 1.f &&
-               angle_ == 0.f;
-    }
-
-    // ============ Сброс к значениям по умолчанию ============
-    void reset()
-    {
-        center_.x = 0.0f;
-        center_.y = 0.0f;
-        zoom_.x = 1.0f;
-        zoom_.y = 1.0f;
-        angle_ = 0.0f;
-    }
-
-    // ============ Дополнительные полезные методы ============
-    bool isZeroZoom() const
-    {
-        return zoom_.x == 0.0f && zoom_.y == 0.0f;
-    }
-
-    bool isUniformZoom() const
-    {
-        return zoom_.x == zoom_.y;
-    }
-
-    void resetView()
-    {
-        center_ = {0.0f, 0.0f};
-        zoom_ = {1.f, 1.f};
-        angle_ = 0.f;    // Градусы
-        sinAngle_ = 0.f; // Синус угла
-        cosAngle_ = 1.f; // Косинус угла
-    }
-
-    bool isDefaultView() const
-    {
-        return 
-        center_.x == 0.f && 
-        center_.y == 0.f && 
-        zoom_.x == 0.f && 
-        zoom_.y == 0.f &&
-        angle_ == 0.f; 
-    }
-
     void rotate(const float angle)
     {
         setAngle(angle_ + angle);
     }
 
+    // ============ Матрица трансформации View ============
+    const Matrix3x3 &getTransformMatrix() const
+    {
+        if (m_dirty)
+        {
+            // Матрица Вида (World -> View space):
+            // 1. Сдвигаем мир на -center_
+            // 2. Вращаем (для камеры вращение мира идет в обратную сторону)
+            // 3. Масштабируем
+
+            // Расчет компонентов с учетом инверсии камеры:
+            // Чтобы мир вращался корректно, используем стандартную матрицу,
+            // которая применится к координатам (Point - Center)
+
+            float a = cosAngle_ * zoom_.x;
+            float b = sinAngle_ * zoom_.x;
+            float c = -sinAngle_ * zoom_.y;
+            float d = cosAngle_ * zoom_.y;
+
+            matrix_.a = a;
+            matrix_.b = b;
+            matrix_.c = c;
+            matrix_.d = d;
+
+            // Сдвиг: точка center_ должна стать точкой (0,0)
+            matrix_.tx = -center_.x * a - center_.y * c;
+            matrix_.ty = -center_.x * b - center_.y * d;
+
+            m_dirty = false;
+        }
+        return matrix_;
+    }
+
+    // ============ Сброс ============
+    void reset()
+    {
+        center_ = {0.0f, 0.0f};
+        zoom_ = {1.0f, 1.0f};
+        angle_ = 0.0f;
+        sinAngle_ = 0.0f;
+        cosAngle_ = 1.0f;
+        m_dirty = true;
+    }
+
+    bool isDefaultView() const
+    {
+        return center_.x == 0.f && center_.y == 0.f &&
+               zoom_.x == 1.f && zoom_.y == 1.f &&
+               angle_ == 0.f;
+    }
 
 private:
     SDL_FPoint center_{0.0f, 0.0f};
     SDL_FPoint zoom_ = {1.f, 1.f};
+    float angle_ = 0.f;
 
-    float angle_ = 0.f;    // Градусы
+    float sinAngle_ = 0.f;
+    float cosAngle_ = 1.f;
 
-    float sinAngle_ = 0.f; // Синус угла
-    float cosAngle_ = 1.f; // Косинус угла
-
-    SDL_FPoint baseCenter_ = {};
+    mutable Matrix3x3 matrix_;
+    mutable bool m_dirty = true;
 };
 
 } // namespace sdl3

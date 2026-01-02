@@ -14,13 +14,13 @@ public:
     RectangleShape(const SDL_FPoint &size = {0.f, 0.f})
         : size_{size}
     {
-        update();
+        updateLocalGeometry();
     }
 
     void setSize(const SDL_FPoint &size)
     {
         size_ = size;
-        update();
+        updateLocalGeometry();
     }
 
     const SDL_FPoint &getSize() const

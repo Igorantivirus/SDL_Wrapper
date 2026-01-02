@@ -17,17 +17,19 @@
 #include <SDLWrapper/DrawTransformObjects/RectangleShape.hpp>
 #include <SDLWrapper/DrawTransformObjects/CircleShape.hpp>
 #include <SDLWrapper/DrawTransformObjects/EllipseShape.hpp>
-#include <SDLWrapper/DrawTransformObjects/Sprite.hpp>
+// #include <SDLWrapper/DrawTransformObjects/Sprite.hpp>
 #include <SDLWrapper/Renders/RenderWindow.hpp>
 
 sdl3::RenderWindow window;
-sdl3::Sprite sprite1;
-sdl3::Sprite sprite2;
-sdl3::Texture texture;
-sdl3::RectangleShape rect;
-sdl3::CircleShape circ;
-sdl3::EllipseShape elip;
 sdl3::View view;
+
+sdl3::Texture texture;
+sdl3::EllipseShape elip;
+// sdl3::Sprite sprite1;
+// sdl3::Sprite sprite2;
+// sdl3::RectangleShape rect;
+// sdl3::CircleShape circ;
+// sdl3::EllipseShape elip;
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
@@ -42,27 +44,28 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     window.loadIconFromFile("ABS.png");
 
     texture.loadFromFile("ABS.png");
-    sprite1.setTexture(texture);
-    sprite1.setPosition({0,0});
-    sprite1.setUniformScale(2.f);
-    sprite1.setOriginKeepPosition({texture.getSize().x / 2.f, texture.getSize().y / 2.f});
 
-    sprite2.setTexture(texture);
-    sprite2.setCenterPosition({100, 100});
+    // sprite1.setTexture(texture);
+    // sprite1.setPosition({0,0});
+    // sprite1.setUniformScale(2.f);
+    // sprite1.setOriginKeepPosition({texture.getSize().x / 2.f, texture.getSize().y / 2.f});
 
-    rect.setSize({200.f, 120.f});
-    rect.setFillColor(SDL_FColor{1,0,0,255});
-    // rect.setTexture(texture);
-    rect.setPosition({300.f, 200.f});
-    rect.setUniformScale(2);
-    rect.setRotation(-45);
+    // sprite2.setTexture(texture);
+    // sprite2.setCenterPosition({100, 100});
 
-    circ.setRadius(50);
-    circ.setTexture(texture);
-    circ.setPosition({500, 200});
-    circ.setOutlineColor(SDL_FColor{0, 1, 0, 1});
-    circ.setOutlineThickness(10);
-    circ.setPointCount(6);
+    // rect.setSize({200.f, 120.f});
+    // rect.setFillColor(SDL_FColor{1,0,0,255});
+    // // rect.setTexture(texture);
+    // rect.setPosition({300.f, 200.f});
+    // rect.setUniformScale(2);
+    // rect.setRotation(-45);
+
+    // circ.setRadius(50);
+    // circ.setTexture(texture);
+    // circ.setPosition({500, 200});
+    // circ.setOutlineColor(SDL_FColor{0, 1, 0, 1});
+    // circ.setOutlineThickness(10);
+    // circ.setPointCount(6);
 
     elip.setPosition({600,300});
     elip.setRadii({50, 70});
@@ -70,7 +73,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
     view = window.getView();
 
-    window.debug();
+    
 
     return SDL_APP_CONTINUE;
 }
@@ -82,6 +85,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
         window.close();
         return SDL_APP_SUCCESS;
     }
+    return SDL_APP_CONTINUE;
     if (event->type == SDL_EVENT_KEY_DOWN)
     {
         if (event->key.key == SDLK_N)
@@ -100,7 +104,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
             pos.x += 1;
         if (pos.x != 0.f || pos.y != 0.f)
         {
-            sprite1.move(pos);
+            elip.move(pos);
             return SDL_APP_CONTINUE;
         }
 
@@ -124,9 +128,9 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
         
 
         if (event->key.scancode == SDL_SCANCODE_KP_8)
-            sprite1.rotate(1);
+            elip.rotate(1);
         else if (event->key.scancode == SDL_SCANCODE_KP_2)
-            sprite1.rotate(-1);
+            elip.rotate(-1);
         else
         {
             if (event->key.scancode == SDL_SCANCODE_KP_4)
@@ -141,17 +145,17 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
             }
             else if(event->key.scancode == SDL_SCANCODE_KP_PLUS)
             {
-                SDL_FPoint scale = sprite1.getScale();
+                SDL_FPoint scale = elip.getScale();
                 scale.x += 0.1f;
                 scale.y += 0.1f;
-                sprite1.setScale(scale);
+                elip.setScale(scale);
             }
             else if(event->key.scancode == SDL_SCANCODE_KP_MINUS)
             {
-                SDL_FPoint scale = sprite1.getScale();
+                SDL_FPoint scale = elip.getScale();
                 scale.x -= 0.1f;
                 scale.y -= 0.1f;
-                sprite1.setScale(scale);
+                elip.setScale(scale);
             }
         }
     }
@@ -161,10 +165,10 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
     window.clear(SDL_Color{255,255,255,255});
-    window.draw(sprite1);
-    window.draw(sprite2);
-    window.draw(rect);
-    window.draw(circ);
+    // window.draw(sprite1);
+    // window.draw(sprite2);
+    // window.draw(rect);
+    // window.draw(circ);
     window.draw(elip);
     window.display();
     return SDL_APP_CONTINUE;

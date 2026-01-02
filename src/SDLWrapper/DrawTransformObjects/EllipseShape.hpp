@@ -1,7 +1,8 @@
 #pragma once
 
-#include <cstddef>
+#include <basetsd.h>
 #include <cmath>
+#include <cstddef>
 
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_stdinc.h>
@@ -16,13 +17,13 @@ public:
     EllipseShape(const SDL_FPoint &radii = {0.0f, 0.0f}, std::size_t pointCount = 40)
         : radii_{radii}, pointCount_(pointCount)
     {
-        update();
+        updateLocalGeometry();
     }
 
     void setRadii(const SDL_FPoint &radii)
     {
         radii_ = radii;
-        update();
+        updateLocalGeometry();
     }
 
     const SDL_FPoint &getRadii() const
@@ -33,7 +34,7 @@ public:
     void setPointCount(std::size_t pointCount)
     {
         pointCount_ = pointCount;
-        update();
+        updateLocalGeometry();
     }
 
     std::size_t getPointCount() const override
