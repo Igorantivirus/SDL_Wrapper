@@ -1,9 +1,9 @@
 #pragma once
 
-#include <SDL3/SDL_stdinc.h>
 #include <cmath>
 #include <cstdlib>
 
+#include <SDL3/SDL_stdinc.h>
 #include <SDL3/SDL_rect.h>
 
 #include <SDLWrapper/Math/Matrix3x3.hpp>
@@ -59,7 +59,7 @@ public:
         const float dx = (newOrigin.x - origin_.x) * scale_.x;
         const float dy = (newOrigin.y - origin_.y) * scale_.y;
 
-        const float rad = (-rotation_) * 3.14159265358979323846f / 180.0f;
+        const float rad = (-rotation_) * SDL_PI_F / 180.0f;
 
         const float c = std::cos(rad);
         const float s = std::sin(rad);
