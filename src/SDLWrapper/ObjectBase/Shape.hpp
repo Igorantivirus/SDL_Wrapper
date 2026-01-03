@@ -57,7 +57,7 @@ public:
     void setOutlineThickness(const float outlineThickness)
     {
         outlineThickness_ = outlineThickness;
-        updateOutline();
+        updateLocalOutline();
     }
     void setTexture(const Texture &texture, const SDL_FRect &rect)
     {
@@ -83,11 +83,56 @@ public:
 protected:
     void updateLocalGeometry()
     {
-        updateShape();
-        updateOutline();
+        updateLocalShape();
+        updateLocalOutline();
     }
 
-    void updateShape()
+private:
+    const Texture *texture_ = nullptr;
+    SDL_FRect textureRect_ = {0, 0, 0, 0};
+
+    SDL_FColor fillColor_ = {1.0f, 1.0f, 1.0f, 1.0f};
+    SDL_FColor outlineColor_ = {1.0f, 1.0f, 1.0f, 1.0f};
+    float outlineThickness_ = 0.0f;
+
+    SDL_FRect localBounds_;
+    std::vector<SDL_Vertex> localVertices_;
+    std::vector<SDL_Vertex> localOutlineVertices_;
+
+    mutable std::vector<SDL_Vertex> vertices_;
+    mutable std::vector<SDL_Vertex> outlineVertices_;
+    mutable bool shapeDirty_ = true;
+    mutable bool outlineDirty_ = true;
+    mutable unsigned viewId_ = 0; // С этим работа позже, пока не трогать
+
+private:
+    void draw(RenderTarget &target) const override
+    {
+        const bool viewDirty = viewId_ != target.getViewId();
+        const bool transformDirty = m_dirty;
+
+        const bool needFillUpdate = transformDirty || shapeDirty_ || viewDirty;
+        const bool needOutlineUpdate = transformDirty || outlineDirty_ || viewDirty;
+
+        if (needFillUpdate || needOutlineUpdate)
+        {
+            Matrix3x3 matrix = target.getView().getTransformMatrix() * getTransformMatrix();
+            const SDL_FPoint screenCenter = target.getTargetCenter();
+            matrix.tx += screenCenter.x;
+            matrix.ty += screenCenter.y;
+
+            if (needFillUpdate)
+                updateVertices(matrix);
+            if (needOutlineUpdate)
+                updateOutlineVertices(matrix);
+
+            viewId_ = target.getViewId();
+        }
+
+        target.drawShape(vertices_, outlineVertices_, texture_);
+    }
+
+    void updateLocalShape()
     {
         size_t count = getPointCount();
         if (count < 3)
@@ -127,7 +172,7 @@ protected:
         // Сбрасываем флаги, помечаем для трансформации
         shapeDirty_ = true;
     }
-    void updateOutline()
+    void updateLocalOutline()
     {
         size_t count = getPointCount();
         if (count < 3)
@@ -217,63 +262,6 @@ protected:
         outlineDirty_ = true;
     }
 
-private:
-    const Texture *texture_ = nullptr;
-    SDL_FRect textureRect_ = {0, 0, 0, 0};
-
-    SDL_FColor fillColor_ = {1.0f, 1.0f, 1.0f, 1.0f};
-    SDL_FColor outlineColor_ = {1.0f, 1.0f, 1.0f, 1.0f};
-    float outlineThickness_ = 0.0f;
-
-    SDL_FRect localBounds_;
-    std::vector<SDL_Vertex> localVertices_;
-    std::vector<SDL_Vertex> localOutlineVertices_;
-
-    mutable std::vector<SDL_Vertex> vertices_;
-    mutable std::vector<SDL_Vertex> outlineVertices_;
-    mutable std::vector<SDL_Vertex> viewVertices_;
-    mutable std::vector<SDL_Vertex> viewOutlineVertices_;
-    mutable bool shapeDirty_ = true;
-    mutable bool outlineDirty_ = true;
-    mutable unsigned viewId_ = 0; // С этим работа позже, пока не трогать
-
-private:
-    void draw(RenderTarget &target) const override
-    {
-        if (m_dirty || shapeDirty_)
-            updateVertices();
-        if (m_dirty || outlineDirty_)
-            updateOutlineVertices();
-        // Всё передатся по обычной ссылке
-        // Там провериться, совпадает ли ID view текущая и у вида окна и при несовпадении массивы обновятся (домножаться на матрицу) и обновится ID.
-        const unsigned targetViewId = target.getViewId();
-        if (viewId_ != targetViewId)
-        {
-            viewVertices_ = vertices_;
-            viewOutlineVertices_ = outlineVertices_;
-
-            const Matrix3x3 viewMatrix = target.getView().getTransformMatrix();
-            const SDL_FPoint screenCenter = target.getTargetCenter();
-
-            for (auto &vert : viewVertices_)
-            {
-                vert = viewMatrix.transform(vert);
-                vert.position.x += screenCenter.x;
-                vert.position.y += screenCenter.y;
-            }
-            for (auto &vert : viewOutlineVertices_)
-            {
-                vert = viewMatrix.transform(vert);
-                vert.position.x += screenCenter.x;
-                vert.position.y += screenCenter.y;
-            }
-
-            viewId_ = targetViewId;
-        }
-
-        target.drawShape(viewVertices_, viewOutlineVertices_, texture_, viewId_);
-    }
-
     void updateLocalBounds()
     {
         SDL_FPoint firstPoint = getPoint(0);
@@ -326,24 +314,20 @@ private:
         }
     }
 
-    void updateVertices() const
+    void updateVertices(const Matrix3x3 &matrix) const
     {
         shapeDirty_ = false; // Фигура обновлена
         viewId_ = 0;         // Но вид не применён
-        Matrix3x3 matrix = getTransformMatrix();
-
         vertices_.clear();
         vertices_.reserve(localVertices_.size());
 
         for (const auto &vert : localVertices_)
             vertices_.push_back(matrix.transform(vert));
     }
-    void updateOutlineVertices() const
+    void updateOutlineVertices(const Matrix3x3 &matrix) const
     {
         outlineDirty_ = false; // Фигура обновлена
         viewId_ = 0;           // Но вид не применён
-        Matrix3x3 matrix = getTransformMatrix();
-
         outlineVertices_.clear();
         outlineVertices_.reserve(localOutlineVertices_.size());
 

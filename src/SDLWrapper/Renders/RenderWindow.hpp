@@ -44,7 +44,7 @@ public:
         isFullScreen_ = mode.fullscreen;
         targetSize_.x = mode.width;
         targetSize_.y = mode.height;
-        RenderTarget::setBaseViewPosition({mode.width / 2.f, mode.height / 2.f});
+        view_.setCenterPosition({mode.width / 2.f, mode.height / 2.f});
         isOpen_ = window_ && renderer_;
         return isOpen_;
     }
@@ -53,7 +53,7 @@ public:
     {
         window_.reset();
         renderer_.reset();
-        // view_.resetView();
+        view_.reset();
         unsubscribe();
         isOpen_ = isFullScreen_ = false;
     }
@@ -79,7 +79,7 @@ public:
 
     bool loadIconFromFile(const std::string_view iconFileName)
     {
-        if(!isOpen_)
+        if (!isOpen_)
             return false;
         SDL_Surface *icon = IMG_Load(iconFileName.data()); // или SDL_LoadBMP("icon.bmp");
 

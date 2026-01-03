@@ -67,9 +67,13 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     // circ.setOutlineThickness(10);
     // circ.setPointCount(6);
 
-    elip.setPosition({600,300});
+    elip.setPosition({0,0});
+    // elip.setPosition({600,300});
     elip.setRadii({50, 70});
-    elip.setFillColor(SDL_FColor{0, 0, 1, 1});
+    elip.setFillColor(SDL_FColor{1, 1, 1, 1});
+    elip.setOutlineColor(SDL_FColor{0,0,0,1});
+    elip.setOutlineThickness(5);
+    elip.setTexture(texture);
 
     view = window.getView();
     // view.setAngle(150);

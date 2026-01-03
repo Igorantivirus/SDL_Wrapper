@@ -1,20 +1,19 @@
 #pragma once
 
-#include <SDL3/SDL_oldnames.h>
-#include <SDL3/SDL_rect.h>
-#include <SDL3/SDL_stdinc.h>
 #include <memory>
 #include <vector>
 
+#include <SDL3/SDL_oldnames.h>
+#include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
+#include <SDL3/SDL_stdinc.h>
+
 
 #include <SDLWrapper/ObjectBase/Drawable.hpp>
-
-// #include "ObjectBase/Transformable.hpp"
-#include "SDLWrapper/Math/Matrix3x3.hpp"
-#include "SDLWrapper/ObjectBase/Transformable.hpp"
-#include "View.hpp"
+#include <SDLWrapper/ObjectBase/Transformable.hpp>
 #include <SDLWrapper/Texture.hpp>
+
+#include "View.hpp"
 
 namespace sdl3
 {
@@ -46,7 +45,7 @@ public:
         const float sy = scale.y * zoom.y;
 
         // Экранная позиция pivot
-        SDL_FPoint screenPivot;// = view_.isDefault() ? pivotPos : worldToScreen(pivotPos);
+        SDL_FPoint screenPivot; // = view_.isDefault() ? pivotPos : worldToScreen(pivotPos);
 
         // Pivot внутри dstRect (в пикселях dstRect)
         SDL_FPoint center;
@@ -74,7 +73,7 @@ public:
         SDL_RenderTextureRotated(renderer_.get(), sdlTex, &srcRect, &dst, angle, &center, SDL_FLIP_NONE);
     }
 
-    void drawShape(std::vector<SDL_Vertex> &fillVertices, std::vector<SDL_Vertex> &outlineVertices, const Texture *texture, unsigned &viewId)
+    void drawShape(const std::vector<SDL_Vertex> &fillVertices, const std::vector<SDL_Vertex> &outlineVertices, const Texture *texture)
     {
         if (!renderer_)
             return;
@@ -84,38 +83,17 @@ public:
         SDL_RenderGeometry(renderer_.get(), nullptr, outlineVertices.data(), static_cast<int>(outlineVertices.size()), nullptr, 0);
     }
 
-    void drawShape(const std::vector<SDL_Vertex> &fillVertices, const std::vector<SDL_Vertex> &outlineVertices, const Texture *texture)
-    {
-        if (!renderer_)
-            return;
-
-        const SDL_Texture *sdlTex = nullptr;
-        if (texture)
-        {
-            auto sp = texture->getSDLTexture().lock();
-            if (sp)
-                sdlTex = sp.get();
-        }
-
-        if (!fillVertices.empty())
-        {
-            SDL_RenderGeometry(renderer_.get(), const_cast<SDL_Texture *>(sdlTex), fillVertices.data(), static_cast<int>(fillVertices.size()), nullptr, 0);
-        }
-
-        if (!outlineVertices.empty())
-        {
-            SDL_RenderGeometry(renderer_.get(), nullptr, outlineVertices.data(), static_cast<int>(outlineVertices.size()), nullptr, 0);
-        }
-    }
-
     const View &getView() const
     {
         return view_;
     }
     void setView(const View &view)
     {
-        view_ = view;
-        ++viewId_;
+        if (view_ != view)
+        {
+            view_ = view;
+            ++viewId_;
+        }
     }
     unsigned getViewId() const
     {
@@ -156,8 +134,8 @@ protected:
         float relX = worldPos.x - view_.getCenterPosition().x;
         float relY = worldPos.y - view_.getCenterPosition().y;
 
-        float rotatedX = 0;//relX * view_.cosAngle_ + relY * view_.sinAngle_;
-        float rotatedY = 0;//-relX * view_.sinAngle_ + relY * view_.cosAngle_;
+        float rotatedX = 0; // relX * view_.cosAngle_ + relY * view_.sinAngle_;
+        float rotatedY = 0; //-relX * view_.sinAngle_ + relY * view_.cosAngle_;
 
         float screenX = (rotatedX * view_.getZoom().x) + (targetSize.x / 2.0f);
         float screenY = (rotatedY * view_.getZoom().y) + (targetSize.y / 2.0f);

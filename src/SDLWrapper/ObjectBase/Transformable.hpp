@@ -140,13 +140,12 @@ public:
         scale_.y *= std::abs(factor);
         m_dirty = true;
     }
-    void resetTransform()
+    void reset()
     {
         position_ = {0.0f, 0.0f};
         origin_ = {0.0f, 0.0f};
         scale_ = {1.0f, 1.0f};
         rotation_ = 0.0f;
-        isTransformed_ = false;
         m_dirty = true;
     }
 
@@ -176,7 +175,6 @@ protected:
     SDL_FPoint origin_ = {0.0f, 0.0f};
     SDL_FPoint scale_ = {1.0f, 1.0f};
     float rotation_ = 0.0f;
-    bool isTransformed_ = false;
 
     mutable Matrix3x3 matrix_;
     mutable bool m_dirty = true;

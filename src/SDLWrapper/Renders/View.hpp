@@ -62,11 +62,7 @@ public:
         float newAngle = std::fmod(degrees, 360.0f);
         if (angle_ == newAngle)
             return;
-
         angle_ = newAngle;
-        float radians = angle_ * (SDL_PI_F / 180.0f);
-        sinAngle_ = std::sin(radians);
-        cosAngle_ = std::cos(radians);
         m_dirty = true;
     }
 
@@ -93,20 +89,18 @@ public:
             // Расчет компонентов с учетом инверсии камеры:
             // Чтобы мир вращался корректно, используем стандартную матрицу,
             // которая применится к координатам (Point - Center)
+            float radians = angle_ * (SDL_PI_F / 180.0f);
+            float sinAngle = std::sin(radians);
+            float cosAngle = std::cos(radians);
 
-            float a = cosAngle_ * zoom_.x;
-            float b = sinAngle_ * zoom_.x;
-            float c = -sinAngle_ * zoom_.y;
-            float d = cosAngle_ * zoom_.y;
-
-            matrix_.a = a;
-            matrix_.b = b;
-            matrix_.c = c;
-            matrix_.d = d;
+            matrix_.a = cosAngle * zoom_.x;
+            matrix_.b = sinAngle * zoom_.x;
+            matrix_.c = -sinAngle * zoom_.y;
+            matrix_.d = cosAngle * zoom_.y;
 
             // Сдвиг: точка center_ должна стать точкой (0,0)
-            matrix_.tx = -center_.x * a - center_.y * c;
-            matrix_.ty = -center_.x * b - center_.y * d;
+            matrix_.tx = -center_.x * matrix_.a - center_.y * matrix_.c;
+            matrix_.ty = -center_.x * matrix_.b - center_.y * matrix_.d;
 
             m_dirty = false;
         }
@@ -119,25 +113,26 @@ public:
         center_ = {0.0f, 0.0f};
         zoom_ = {1.0f, 1.0f};
         angle_ = 0.0f;
-        sinAngle_ = 0.0f;
-        cosAngle_ = 1.0f;
         m_dirty = true;
     }
 
-    bool isDefaultView() const
+    bool operator==(const View &other)
     {
-        return center_.x == 0.f && center_.y == 0.f &&
-               zoom_.x == 1.f && zoom_.y == 1.f &&
-               angle_ == 0.f;
+        return center_.x == other.center_.x &&
+               center_.y == other.center_.y &&
+               zoom_.x == other.zoom_.x &&
+               zoom_.y == other.zoom_.y &&
+               angle_ == other.angle_;
+    }
+    bool operator!=(const View &other)
+    {
+        return !this->operator==(other);
     }
 
 private:
     SDL_FPoint center_{0.0f, 0.0f};
     SDL_FPoint zoom_ = {1.f, 1.f};
     float angle_ = 0.f;
-
-    float sinAngle_ = 0.f;
-    float cosAngle_ = 1.f;
 
     mutable Matrix3x3 matrix_;
     mutable bool m_dirty = true;
