@@ -1,3 +1,4 @@
+#include "SDLWrapper/Math/Colors.hpp"
 #include "SDLWrapper/Math/Convert.hpp"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_init.h>
@@ -54,7 +55,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     sprite1.setPosition({0,0});
     sprite1.setUniformScale(2.f);
     sprite1.setOriginKeepPosition({texture.getSize().x / 2.f, texture.getSize().y / 2.f});
-    sprite1.setFilterColor(SDL_FColor{0,0,1,1});
+    sprite1.setFilterColor(sdl3::Color::Blue);
 
 
     sprite2.setTexture(texture);
@@ -62,7 +63,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     sprite2.setOriginKeepPosition(sdl3::toFPoint(texture.getSize()) / 2.f);
 
     rect.setSize({200.f, 120.f});
-    rect.setFillColor(SDL_FColor{1,0,0,255});
+    rect.setFillColor(sdl3::Color::Red);
     rect.setTexture(texture);
     rect.setPosition({300.f, 200.f});
     rect.setUniformScale(2);
@@ -71,14 +72,14 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     circ.setRadius(50);
     circ.setTexture(texture);
     circ.setPosition({500, 200});
-    circ.setOutlineColor(SDL_FColor{0, 1, 0, 1});
+    circ.setOutlineColor(sdl3::Color::Green);
     circ.setOutlineThickness(10);
     circ.setPointCount(2);
 
     elip.setPosition({600,300});
     elip.setRadii({50, 70});
-    elip.setFillColor(SDL_FColor{1, 1, 1, 1});
-    elip.setOutlineColor(SDL_FColor{1, 0, 0, 1});
+    elip.setFillColor(sdl3::Color::Black);
+    elip.setOutlineColor(sdl3::Color::Red);
     elip.setOutlineThickness(5);
     elip.setTexture(texture);
     elip.setTextureRect({10, 10, 35, 35});
