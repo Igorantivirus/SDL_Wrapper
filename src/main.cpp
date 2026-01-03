@@ -1,9 +1,12 @@
+
+
 #include "SDLWrapper/Math/Colors.hpp"
 #include "SDLWrapper/Math/Convert.hpp"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_keycode.h>
 #include <SDL3/SDL_loadso.h>
+#include <SDL3/SDL_log.h>
 #include <SDL3/SDL_oldnames.h>
 #include <SDL3/SDL_pixels.h>
 #include <SDL3/SDL_rect.h>
@@ -20,11 +23,12 @@
 #include <SDLWrapper/DrawTransformObjects/EllipseShape.hpp>
 #include <SDLWrapper/DrawTransformObjects/RectangleShape.hpp>
 #include <SDLWrapper/DrawTransformObjects/Sprite.hpp>
-#include <SDLWrapper/Renders/RenderWindow.hpp>
 #include <SDLWrapper/Math/Operators.hpp>
+#include <SDLWrapper/Renders/RenderWindow.hpp>
+
+#include <SDLWrapper/Log.hpp>
 
 using namespace sdl3::operators;
-
 
 sdl3::RenderWindow window;
 sdl3::View view;
@@ -37,8 +41,11 @@ sdl3::RectangleShape rect;
 sdl3::CircleShape circ;
 
 
+
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
+    sdl3::log::config::logFileName = "log.log";
+    sdl3::log::config::toFile = true;
     // SDL_SharedObject
     // SDL_SetRenderScale(SDL_Renderer *renderer, float scaleX, float scaleY)
 
@@ -52,11 +59,10 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     texture.loadFromFile("ABS.png");
 
     sprite1.setTexture(texture);
-    sprite1.setPosition({0,0});
+    sprite1.setPosition({0, 0});
     sprite1.setUniformScale(2.f);
     sprite1.setOriginKeepPosition({texture.getSize().x / 2.f, texture.getSize().y / 2.f});
     sprite1.setFilterColor(sdl3::Color::Blue);
-
 
     sprite2.setTexture(texture);
     sprite2.setPosition({100, 100});
@@ -76,7 +82,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     circ.setOutlineThickness(10);
     circ.setPointCount(2);
 
-    elip.setPosition({600,300});
+    elip.setPosition({600, 300});
     elip.setRadii({50, 70});
     elip.setFillColor(sdl3::Color::Black);
     elip.setOutlineColor(sdl3::Color::Red);
@@ -106,6 +112,20 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
         {
             window.close();
             return SDL_APP_SUCCESS;
+        }
+        if (event->key.key == SDLK_L)
+        {
+            LOG_INFO("ABOBA {} {} {}", "negr", 2, 3.1415);
+            // error("ABOBA");
+            //  SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, "%s", "ABOBA");
+            return SDL_APP_CONTINUE;
+        }
+        if (event->key.key == SDLK_M)
+        {
+            LOG_ERROR("Пользователь, гад такой, нажал {}!!! Наказание: {}", "M", "Палка в дупу");
+            // error("ABOBA");
+            //  SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, "%s", "ABOBA");
+            return SDL_APP_CONTINUE;
         }
         if (event->key.key == SDLK_N)
         {
