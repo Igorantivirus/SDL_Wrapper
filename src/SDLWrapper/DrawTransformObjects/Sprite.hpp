@@ -15,6 +15,15 @@ class Sprite : public Drawable, public Transformable
 public:
     Sprite() = default;
 
+    void setFilterColor(const SDL_FColor& color)
+    {
+        color_ = color;
+    }
+    const SDL_FColor& getFilterColor() const
+    {
+        return color_;
+    }
+
     void setTexture(const Texture &texture)
     {
         texture_ = &texture;
@@ -71,9 +80,11 @@ private:
     const Texture *texture_;
     SDL_FRect textureRect_; // Какую часть текстуры отрисовать
 
+    SDL_FColor color_ = {1.f, 1.f, 1.f, 1.f};
+
     SDL_FPoint localVertices_[4]{};
     SDL_FPoint textureUV_[4]{};
-    
+
     mutable SDL_FPoint vertices_[4]{};
     mutable bool dirty_ = false;
     mutable unsigned viewId_ = 0;
@@ -95,7 +106,7 @@ private:
             updateVertices(matrix);
             viewId_ = target.getViewId();
         }
-        target.drawShape(texture_, vertices_, 4, textureUV_, 4, indices_, 6);
+        target.drawShape(texture_, vertices_, 4, textureUV_, 4, color_, indices_, 6);
     }
 
     void updateLocalGeometry()

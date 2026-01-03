@@ -128,8 +128,8 @@ private:
 
             viewId_ = target.getViewId();
         }
-        target.drawShape(texture_, vertices_, fillColor_, textureUV_);
-        target.drawShape(outlineVertices_, outlineColor_);
+        target.drawShape(texture_, vertices_.data(), vertices_.size(), textureUV_.data(), textureUV_.size(), fillColor_, nullptr, 0);
+        target.drawShape(nullptr, outlineVertices_.data(), outlineVertices_.size(), nullptr, 0, outlineColor_, nullptr, 0);
     }
 
     void updateLocalShape()

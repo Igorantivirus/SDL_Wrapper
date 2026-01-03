@@ -1,9 +1,8 @@
 #pragma once
 
-#include <SDL3/SDL_pixels.h>
 #include <memory>
-#include <vector>
 
+#include <SDL3/SDL_pixels.h>
 #include <SDL3/SDL_oldnames.h>
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
@@ -28,91 +27,22 @@ public:
         object.draw(*this);
     }
 
-    void drawShape(const Texture *texture, const SDL_FPoint* positions, const int posCnt, const SDL_FPoint* uv, const int uvCnt, const int* indices, const int indCnt)
+    void drawShape(const Texture *texture,
+                   const SDL_FPoint *positions, const int posCnt,
+                   const SDL_FPoint *uv, const int uvCnt,
+                   const SDL_FColor &color,
+                   const int *indices, const int indCnt
+                )
     {
-        if (!renderer_ || !posCnt || !uvCnt)
+        if (!renderer_ || !posCnt)
             return;
-        int size = std::min(posCnt, uvCnt);
         SDL_Texture *sdlTex = getRawTextureFromTexture(texture);
-        SDL_FColor color = {1.f,1.f,1.f,1.f};
-        SDL_RenderGeometryRaw(renderer_.get(), sdlTex, &positions->x, sizeof(SDL_FPoint), &color, 0, &uv->x, sizeof(SDL_FPoint), size, indices, indCnt, sizeof(int));
-    }
-
-    void drawShape(const Texture *texture, const std::vector<SDL_FPoint> &positions, const SDL_FColor &color, const std::vector<SDL_FPoint> &uv)
-    {
-        if (!renderer_ || positions.empty() || uv.empty())
-            return;
-        int size = static_cast<int>(std::min(positions.size(), uv.size()));
-        SDL_Texture *sdlTex = getRawTextureFromTexture(texture);
-
-        SDL_RenderGeometryRaw(renderer_.get(), sdlTex, &positions.data()->x, sizeof(SDL_FPoint), &color, 0, &uv.data()->x, sizeof(SDL_FPoint), size, nullptr, 0, 0);
-    }
-    void drawShape(const std::vector<SDL_FPoint> &positions, const SDL_FColor &color)
-    {
-        if (!renderer_ || positions.empty())
-            return;
-        SDL_RenderGeometryRaw(renderer_.get(), nullptr, &positions.data()->x, sizeof(SDL_FPoint), &color, 0, nullptr, 0, static_cast<int>(positions.size()), nullptr, 0, 0);
-    }
-
-    void drawTexture(const Texture &texture, const Transformable &tr, const SDL_FRect &srcRect)
-    {
-        auto sp = texture.getSDLTexture().lock();
-        if (!sp)
-            return;
-        SDL_Texture *sdlTex = const_cast<SDL_Texture *>(sp.get());
-
-        const SDL_FPoint pivotPos = tr.getPosition(); // pivot/origin position in world
-        const SDL_FPoint scale = tr.getScale();
-        const SDL_FPoint origin = tr.getOrigin();
-        const float rotDeg = tr.getRotation();
-
-        const SDL_FPoint zoom = view_.getZoom();
-        const float sx = scale.x * zoom.x;
-        const float sy = scale.y * zoom.y;
-
-        // Экранная позиция pivot
-        SDL_FPoint screenPivot; // = view_.isDefault() ? pivotPos : worldToScreen(pivotPos);
-
-        // Pivot внутри dstRect (в пикселях dstRect)
-        SDL_FPoint center;
-        center.x = origin.x * sx;
-        center.y = origin.y * sy;
-
-        SDL_FRect dst;
-        dst.w = srcRect.w * sx;
-        dst.h = srcRect.h * sy;
-
-        // ВАЖНОЕ отличие: dstRect строим так, чтобы pivot оказался в screenPivot
-        dst.x = screenPivot.x - center.x;
-        dst.y = screenPivot.y - center.y;
-
-        // Быстрый путь: если нет поворота и камера default, можно без Rotated,
-        // но смещение по origin всё равно нужно, иначе pivot "уедет".
-        // if (view_.isDefault() && rotDeg == 0.0f)
-        // {
-        //     SDL_RenderTexture(renderer_.get(), sdlTex, &srcRect, &dst);
-        //     return;
-        // }
-
-        const double angle = double(rotDeg - view_.getAngle());
-
-        SDL_RenderTextureRotated(renderer_.get(), sdlTex, &srcRect, &dst, angle, &center, SDL_FLIP_NONE);
-    }
-
-    void drawShape(const std::vector<SDL_Vertex> &fillVertices, const std::vector<SDL_Vertex> &outlineVertices, const Texture *texture)
-    {
-        if (!renderer_)
-            return;
-        const SDL_Texture *sdlTex = getRawTextureFromTexture(texture);
-        SDL_RenderGeometry(renderer_.get(), const_cast<SDL_Texture *>(sdlTex), fillVertices.data(), static_cast<int>(fillVertices.size()), nullptr, 0);
-        SDL_RenderGeometry(renderer_.get(), nullptr, outlineVertices.data(), static_cast<int>(outlineVertices.size()), nullptr, 0);
-    }
-    void drawShape(const SDL_Vertex *vertices, const int cnt, const Texture *texture, const int *indices, const int indCnt)
-    {
-        if (!renderer_)
-            return;
-        const SDL_Texture *sdlTex = getRawTextureFromTexture(texture);
-        SDL_RenderGeometry(renderer_.get(), const_cast<SDL_Texture *>(sdlTex), vertices, cnt, indices, indCnt);
+        SDL_RenderGeometryRaw(renderer_.get(), sdlTex,
+                              &positions->x, sizeof(SDL_FPoint),
+                              &color, 0,
+                              &uv->x, sizeof(SDL_FPoint),
+                              posCnt,
+                              indices, indCnt, sizeof(int));
     }
 
     const View &getView() const
