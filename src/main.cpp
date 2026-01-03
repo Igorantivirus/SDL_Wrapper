@@ -1,3 +1,4 @@
+#include "SDLWrapper/Math/Convert.hpp"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_keycode.h>
@@ -19,6 +20,9 @@
 #include <SDLWrapper/DrawTransformObjects/RectangleShape.hpp>
 #include <SDLWrapper/DrawTransformObjects/Sprite.hpp>
 #include <SDLWrapper/Renders/RenderWindow.hpp>
+#include <SDLWrapper/Math/Operators.hpp>
+
+using namespace sdl3::operators;
 
 
 sdl3::RenderWindow window;
@@ -26,11 +30,11 @@ sdl3::View view;
 
 sdl3::Texture texture;
 sdl3::EllipseShape elip;
-// sdl3::Sprite sprite1;
+sdl3::Sprite sprite1;
 sdl3::Sprite sprite2;
-// sdl3::RectangleShape rect;
-// sdl3::CircleShape circ;
-// sdl3::EllipseShape elip;
+sdl3::RectangleShape rect;
+sdl3::CircleShape circ;
+
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
@@ -46,31 +50,32 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
     texture.loadFromFile("ABS.png");
 
-    // sprite1.setTexture(texture);
-    // sprite1.setPosition({0,0});
-    // sprite1.setUniformScale(2.f);
-    // sprite1.setOriginKeepPosition({texture.getSize().x / 2.f, texture.getSize().y / 2.f});
+    sprite1.setTexture(texture);
+    sprite1.setPosition({0,0});
+    sprite1.setUniformScale(2.f);
+    sprite1.setOriginKeepPosition({texture.getSize().x / 2.f, texture.getSize().y / 2.f});
+    sprite1.setFilterColor(SDL_FColor{0,0,1,1});
+
 
     sprite2.setTexture(texture);
     sprite2.setPosition({100, 100});
-    sprite2.setOriginKeepPosition({texture.getSize().x / 2.f, texture.getSize().y / 2.f});
+    sprite2.setOriginKeepPosition(sdl3::toFPoint(texture.getSize()) / 2.f);
 
-    // rect.setSize({200.f, 120.f});
-    // rect.setFillColor(SDL_FColor{1,0,0,255});
-    // // rect.setTexture(texture);
-    // rect.setPosition({300.f, 200.f});
-    // rect.setUniformScale(2);
-    // rect.setRotation(-45);
+    rect.setSize({200.f, 120.f});
+    rect.setFillColor(SDL_FColor{1,0,0,255});
+    rect.setTexture(texture);
+    rect.setPosition({300.f, 200.f});
+    rect.setUniformScale(2);
+    rect.setRotation(-45);
 
-    // circ.setRadius(50);
-    // circ.setTexture(texture);
-    // circ.setPosition({500, 200});
-    // circ.setOutlineColor(SDL_FColor{0, 1, 0, 1});
-    // circ.setOutlineThickness(10);
-    // circ.setPointCount(6);
+    circ.setRadius(50);
+    circ.setTexture(texture);
+    circ.setPosition({500, 200});
+    circ.setOutlineColor(SDL_FColor{0, 1, 0, 1});
+    circ.setOutlineThickness(10);
+    circ.setPointCount(2);
 
-    elip.setPosition({300, 300});
-    // elip.setPosition({600,300});
+    elip.setPosition({600,300});
     elip.setRadii({50, 70});
     elip.setFillColor(SDL_FColor{1, 1, 1, 1});
     elip.setOutlineColor(SDL_FColor{1, 0, 0, 1});
@@ -188,10 +193,10 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
     window.clear(SDL_Color{255, 255, 255, 255});
-    // window.draw(sprite1);
+    window.draw(sprite1);
     window.draw(sprite2);
-    // window.draw(rect);
-    // window.draw(circ);
+    window.draw(rect);
+    window.draw(circ);
     window.draw(elip);
     window.display();
     return SDL_APP_CONTINUE;
