@@ -18,12 +18,6 @@
 namespace sdl3
 {
 
-struct ShapeVertex
-{
-    SDL_FPoint position{};
-    SDL_FPoint tex_coord{};
-};
-
 class RenderTarget
 {
 public:
@@ -32,6 +26,16 @@ public:
     void draw(const Drawable &object)
     {
         object.draw(*this);
+    }
+
+    void drawShape(const Texture *texture, const SDL_FPoint* positions, const int posCnt, const SDL_FPoint* uv, const int uvCnt, const int* indices, const int indCnt)
+    {
+        if (!renderer_ || !posCnt || !uvCnt)
+            return;
+        int size = std::min(posCnt, uvCnt);
+        SDL_Texture *sdlTex = getRawTextureFromTexture(texture);
+        SDL_FColor color = {1.f,1.f,1.f,1.f};
+        SDL_RenderGeometryRaw(renderer_.get(), sdlTex, &positions->x, sizeof(SDL_FPoint), &color, 0, &uv->x, sizeof(SDL_FPoint), size, indices, indCnt, sizeof(int));
     }
 
     void drawShape(const Texture *texture, const std::vector<SDL_FPoint> &positions, const SDL_FColor &color, const std::vector<SDL_FPoint> &uv)

@@ -71,8 +71,10 @@ private:
     const Texture *texture_;
     SDL_FRect textureRect_; // Какую часть текстуры отрисовать
 
-    SDL_Vertex localVertices_[4]{};
-    mutable SDL_Vertex vertices_[4]{};
+    SDL_FPoint localVertices_[4]{};
+    SDL_FPoint textureUV_[4]{};
+    
+    mutable SDL_FPoint vertices_[4]{};
     mutable bool dirty_ = false;
     mutable unsigned viewId_ = 0;
 
@@ -93,16 +95,16 @@ private:
             updateVertices(matrix);
             viewId_ = target.getViewId();
         }
-        target.drawShape(vertices_, 4, texture_, indices_, 6);
+        target.drawShape(texture_, vertices_, 4, textureUV_, 4, indices_, 6);
     }
 
     void updateLocalGeometry()
     {
         // 1. Позиции (простой прямоугольник от 0 до W/H)
-        localVertices_[0].position = {0.f, 0.f};
-        localVertices_[1].position = {textureRect_.w, 0.f};
-        localVertices_[2].position = {textureRect_.w, textureRect_.h};
-        localVertices_[3].position = {0.f, textureRect_.h};
+        localVertices_[0] = {0.f, 0.f};
+        localVertices_[1] = {textureRect_.w, 0.f};
+        localVertices_[2] = {textureRect_.w, textureRect_.h};
+        localVertices_[3] = {0.f, textureRect_.h};
 
         // 2. UV-координаты (нормализуем textureRect относительно размера текстуры)
         SDL_Point texSize = texture_->getSize();
@@ -114,27 +116,18 @@ private:
         float u2 = (textureRect_.x + textureRect_.w) / tw;
         float v2 = (textureRect_.y + textureRect_.h) / th;
 
-        localVertices_[0].tex_coord = {u1, v1};
-        localVertices_[1].tex_coord = {u2, v1};
-        localVertices_[2].tex_coord = {u2, v2};
-        localVertices_[3].tex_coord = {u1, v2};
-
-        // 3. Цвет
-        for (int i = 0; i < 4; ++i)
-            localVertices_[i].color = SDL_FColor{1, 1, 1, 1};
+        textureUV_[0] = {u1, v1};
+        textureUV_[1] = {u2, v1};
+        textureUV_[2] = {u2, v2};
+        textureUV_[3] = {u1, v2};
+        dirty_ = true;
     }
 
     void updateVertices(const Matrix3x3 &matrix) const
     {
         for (int i = 0; i < 4; ++i)
-        {
-            // Копируем UV и Цвет из локального эталона
-            vertices_[i].tex_coord = localVertices_[i].tex_coord;
-            vertices_[i].color = localVertices_[i].color;
-
-            // Трансформируем только позицию
-            vertices_[i].position = matrix.transform(localVertices_[i].position);
-        }
+            vertices_[i] = matrix.transform(localVertices_[i]);
+        dirty_ = false;
     }
 };
 
