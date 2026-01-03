@@ -56,7 +56,6 @@ private:
     mutable std::vector<SDL_FPoint> outlineVertices_;
     mutable bool shapeDirty_ = true;
     mutable bool outlineDirty_ = true;
-    mutable unsigned viewId_ = 0;
 
 private:
     void draw(RenderTarget &target) const override;

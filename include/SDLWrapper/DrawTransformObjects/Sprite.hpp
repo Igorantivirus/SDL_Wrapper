@@ -41,7 +41,6 @@ private:
 
     mutable SDL_FPoint vertices_[4]{};
     mutable bool dirty_ = false;
-    mutable unsigned viewId_ = 0;
 
     static constexpr int indices_[6] = {0, 1, 2, 2, 3, 0};
 

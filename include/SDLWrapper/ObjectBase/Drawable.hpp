@@ -16,6 +16,11 @@ public:
 
 protected:
     virtual void draw(RenderTarget &target) const = 0;
+
+protected:
+
+    mutable unsigned viewID_ = static_cast<unsigned>(-1);
+
 };
 
 } // namespace sdl3

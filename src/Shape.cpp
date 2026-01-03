@@ -80,7 +80,7 @@ void Shape::updateLocalGeometry()
 
 void Shape::draw(RenderTarget &target) const
 {
-    const bool viewDirty = viewId_ != target.getViewId();
+    const bool viewDirty = viewID_ != target.getViewId();
     const bool transformDirty = m_dirty;
 
     const bool needFillUpdate = transformDirty || shapeDirty_ || viewDirty;
@@ -98,7 +98,7 @@ void Shape::draw(RenderTarget &target) const
         if (needOutlineUpdate)
             updateOutlineVertices(matrix);
 
-        viewId_ = target.getViewId();
+        viewID_ = target.getViewId();
     }
 
     target.drawShape(texture_,
@@ -294,7 +294,6 @@ void Shape::updateTexturePoints()
 void Shape::updateVertices(const Matrix3x3 &matrix) const
 {
     shapeDirty_ = false;
-    viewId_ = 0;
     vertices_.clear();
     vertices_.reserve(localVertices_.size());
 
@@ -305,7 +304,6 @@ void Shape::updateVertices(const Matrix3x3 &matrix) const
 void Shape::updateOutlineVertices(const Matrix3x3 &matrix) const
 {
     outlineDirty_ = false;
-    viewId_ = 0;
     outlineVertices_.clear();
     outlineVertices_.reserve(localOutlineVertices_.size());
 

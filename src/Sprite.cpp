@@ -77,14 +77,14 @@ void Sprite::draw(RenderTarget &target) const
     if (!texture_)
         return;
 
-    if (viewId_ != target.getViewId() || m_dirty || dirty_)
+    if (viewID_ != target.getViewId() || m_dirty || dirty_)
     {
         Matrix3x3 matrix = target.getView().getTransformMatrix() * getTransformMatrix();
         const SDL_FPoint screenCenter = target.getTargetCenter();
         matrix.tx += screenCenter.x;
         matrix.ty += screenCenter.y;
         updateVertices(matrix);
-        viewId_ = target.getViewId();
+        viewID_ = target.getViewId();
     }
     target.drawShape(texture_, vertices_, 4, textureUV_, 4, color_, indices_, 6);
 }
