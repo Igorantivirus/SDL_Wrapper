@@ -99,15 +99,32 @@ void Log(const SDL_LogPriority level, const std::source_location &loc, const std
     }
 
 #ifdef __ANDROID__
-    // На Android используем SDL_Log, он сам добавит приоритет и теги в logcat
+    if (!config::toConsole)
+        return;
+
+    std::string timeStr = config::showTime ? std::format("[{}] ", getTimeString()) : "";
+
     if (config::printLocation[(size_t)level])
     {
-        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, (SDL_LogPriority)level, "[%s] %s (%s:%u)", getLevelName(level).data(), message.c_str(), loc.file_name(), loc.line());
+        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION,
+                       (SDL_LogPriority)level,
+                       "%s[%s] %s (%s:%u)",
+                       timeStr.c_str(),
+                       getLevelName(level).data(),
+                       message.c_str(),
+                       loc.file_name(),
+                       (unsigned)loc.line());
     }
     else
     {
-        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, (SDL_LogPriority)level, "%s", message.c_str());
+        // оставляем как было: без [LEVEL], просто сообщение (но с временем, если включено)
+        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION,
+                       (SDL_LogPriority)level,
+                       "%s%s",
+                       timeStr.c_str(),
+                       message.c_str());
     }
+
 #else
     // Desktop логирование
     std::string finalOutput;
