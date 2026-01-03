@@ -73,10 +73,6 @@ public:
         origin_ = newOrigin;
         m_dirty = true;
     }
-    virtual void setCenterPosition(const SDL_FPoint &position)
-    {
-        m_dirty = true;
-    }
     void setOrigin(const SDL_FPoint &origin)
     {
         if(origin_.x == origin.x && origin_.y == origin.y)
@@ -152,10 +148,6 @@ public:
     const SDL_FPoint &getPosition() const
     {
         return position_;
-    }
-    SDL_FPoint getCenterPosition() const
-    {
-        return SDL_FPoint{position_.x, position_.y};
     }
     const SDL_FPoint &getOrigin() const
     {
