@@ -1,7 +1,7 @@
 
 
-#include "SDLWrapper/Math/Colors.hpp"
-#include "SDLWrapper/Math/Convert.hpp"
+#include <SDLWrapper/Math/Colors.hpp>
+#include <SDLWrapper/Math/Convert.hpp>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_keycode.h>
@@ -27,6 +27,7 @@
 #include <SDLWrapper/Renders/RenderWindow.hpp>
 
 #include <SDLWrapper/Log.hpp>
+#include <SDLWrapper/Texture.hpp>
 
 using namespace sdl3::operators;
 
@@ -54,7 +55,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     mode.width /= 2.f;
     mode.height /= 2.f;
     bool res = window.create("window", mode);
-    window.loadIconFromFile("ABS.png");
+    window.loadIconFromFile("ABS.2png");
 
     texture.loadFromFile("ABS.png");
 

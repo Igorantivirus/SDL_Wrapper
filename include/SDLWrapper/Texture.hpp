@@ -1,0 +1,37 @@
+#pragma once
+
+#include <cstddef>
+#include <memory>
+
+#include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_render.h>
+
+namespace sdl3
+{
+
+class Texture
+{
+public:
+    explicit Texture(std::size_t windowID = 0);
+
+    bool loadFromFile(const char *fileName);
+    void clear();
+
+    std::weak_ptr<const SDL_Texture> getSDLTexture() const;
+    std::weak_ptr<SDL_Texture> getSDLTexture();
+
+    const SDL_Point &getSize() const;
+
+private:
+
+    std::shared_ptr<SDL_Texture> texture_ = nullptr;
+    SDL_Point size_ = {};
+
+    std::size_t windowID_ = std::size_t(-1);
+
+private:
+    void updateSize();
+};
+
+} // namespace sdl3
+

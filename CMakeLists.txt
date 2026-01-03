@@ -7,6 +7,7 @@ project("Android-SDL3-Example" LANGUAGES CXX C)
 
 set(EXECUTABLE_NAME ${PROJECT_NAME})
 set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
+set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
 set(THIRD_PARTY_BUILD_DIR "${CMAKE_BINARY_DIR}/_3rdparty")
 
 if(NOT DEFINED EXTERNAL_DIR)
@@ -15,9 +16,27 @@ endif()
 
 set(SOURCE_CPP
     ${SRC_DIR}/main.cpp
+    
+    ${SRC_DIR}/CircleShape.cpp
+    ${SRC_DIR}/Convert.cpp
+    ${SRC_DIR}/EllipseShape.cpp
+    ${SRC_DIR}/Log.cpp
+    ${SRC_DIR}/Matrix3x3.cpp
+    ${SRC_DIR}/Operators.cpp
+    ${SRC_DIR}/RectangleShape.cpp
+    ${SRC_DIR}/RenderMeneger.cpp
+    ${SRC_DIR}/RenderTarget.cpp
+    ${SRC_DIR}/RenderWindow.cpp
+    ${SRC_DIR}/Shape.cpp
+    ${SRC_DIR}/Sprite.cpp
+    ${SRC_DIR}/Texture.cpp
+    ${SRC_DIR}/Transformable.cpp
+    ${SRC_DIR}/VectorMath.cpp
+    ${SRC_DIR}/VideoMode.cpp
+    ${SRC_DIR}/View.cpp
 )
 set(INCLUDE_PATHS
-    ${SRC_DIR}
+    ${INCLUDE_DIR}
 )
 
 if(ANDROID)

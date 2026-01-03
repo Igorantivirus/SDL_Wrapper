@@ -1,0 +1,82 @@
+#include <SDL3/SDL_error.h>
+#include <SDLWrapper/Texture.hpp>
+
+#include <SDL3/SDL_log.h>
+#include <SDL3/SDL_properties.h>
+#include <SDL3/SDL_render.h>
+#include <SDL3_image/SDL_image.h>
+
+#include <SDLWrapper/Log.hpp>
+#include <SDLWrapper/Renders/RenderMeneger.hpp>
+
+struct TextureDeleter
+{
+    void operator()(SDL_Texture *texture) const noexcept
+    {
+        SDL_DestroyTexture(texture);
+    }
+};
+
+namespace sdl3
+{
+
+Texture::Texture(const std::size_t windowID) : windowID_(windowID)
+{
+}
+
+bool Texture::loadFromFile(const char *fileName)
+{
+    clear();
+    std::shared_ptr<SDL_Renderer> rendererS = RenderMeneger::getRenderer(windowID_).lock();
+    if (!rendererS)
+    {
+        log::Error("There is no renderer to open the texture", std::source_location::current());
+        return false;
+    }
+    SDL_Renderer *renderer = rendererS.get();
+
+    SDL_Texture *texture = IMG_LoadTexture(renderer, fileName);
+    if (!texture)
+    {
+        log::Error("Failed to load texture from file: \"{}\" with SDL error: \"{}\"", std::source_location::current(), fileName, SDL_GetError());
+        return false;
+    }
+    texture_.reset(texture, TextureDeleter{});
+    updateSize();
+    return true;
+}
+
+void Texture::clear()
+{
+    size_ = {};
+    texture_.reset();
+}
+
+std::weak_ptr<const SDL_Texture> Texture::getSDLTexture() const
+{
+    return texture_;
+}
+
+std::weak_ptr<SDL_Texture> Texture::getSDLTexture()
+{
+    return texture_;
+}
+
+const SDL_Point &Texture::getSize() const
+{
+    return size_;
+}
+
+void Texture::updateSize()
+{
+    if (!texture_)
+    {
+        size_ = {};
+        return;
+    }
+    auto messageTexProps = SDL_GetTextureProperties(texture_.get());
+    size_.x = static_cast<int>(SDL_GetNumberProperty(messageTexProps, SDL_PROP_TEXTURE_WIDTH_NUMBER, 0));
+    size_.y = static_cast<int>(SDL_GetNumberProperty(messageTexProps, SDL_PROP_TEXTURE_HEIGHT_NUMBER, 0));
+}
+
+} // namespace sdl3
