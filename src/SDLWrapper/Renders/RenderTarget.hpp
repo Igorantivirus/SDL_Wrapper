@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SDL3/SDL_pixels.h>
 #include <memory>
 #include <vector>
 
@@ -17,6 +18,12 @@
 namespace sdl3
 {
 
+struct ShapeVertex
+{
+    SDL_FPoint position{};
+    SDL_FPoint tex_coord{};
+};
+
 class RenderTarget
 {
 public:
@@ -25,6 +32,22 @@ public:
     void draw(const Drawable &object)
     {
         object.draw(*this);
+    }
+
+    void drawShape(const Texture *texture, const std::vector<SDL_FPoint> &positions, const SDL_FColor &color, const std::vector<SDL_FPoint> &uv)
+    {
+        if (!renderer_ || positions.empty() || uv.empty())
+            return;
+        int size = static_cast<int>(std::min(positions.size(), uv.size()));
+        SDL_Texture *sdlTex = getRawTextureFromTexture(texture);
+
+        SDL_RenderGeometryRaw(renderer_.get(), sdlTex, &positions.data()->x, sizeof(SDL_FPoint), &color, 0, &uv.data()->x, sizeof(SDL_FPoint), size, nullptr, 0, 0);
+    }
+    void drawShape(const std::vector<SDL_FPoint> &positions, const SDL_FColor &color)
+    {
+        if (!renderer_ || positions.empty())
+            return;
+        SDL_RenderGeometryRaw(renderer_.get(), nullptr, &positions.data()->x, sizeof(SDL_FPoint), &color, 0, nullptr, 0, static_cast<int>(positions.size()), nullptr, 0, 0);
     }
 
     void drawTexture(const Texture &texture, const Transformable &tr, const SDL_FRect &srcRect)
@@ -148,10 +171,10 @@ protected:
         return SDL_FPoint{screenX, screenY};
     }
 
-    const SDL_Texture *getRawTextureFromTexture(const Texture *texture)
+    SDL_Texture *getRawTextureFromTexture(const Texture *texture)
     {
         if (texture)
-            return texture->getSDLTexture().lock().get();
+            return const_cast<SDL_Texture *>(texture->getSDLTexture().lock().get());
         return nullptr;
     }
 };

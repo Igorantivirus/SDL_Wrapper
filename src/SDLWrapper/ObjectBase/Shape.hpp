@@ -48,12 +48,10 @@ public:
     void setFillColor(const SDL_FColor &color)
     {
         fillColor_ = color;
-        updateFillColors();
     }
     void setOutlineColor(const SDL_FColor &color)
     {
         outlineColor_ = color;
-        updateOutlineColors();
     }
     void setOutlineThickness(const float outlineThickness)
     {
@@ -97,14 +95,15 @@ private:
     float outlineThickness_ = 0.0f;
 
     SDL_FRect localBounds_;
-    std::vector<SDL_Vertex> localVertices_;
-    std::vector<SDL_Vertex> localOutlineVertices_;
+    std::vector<SDL_FPoint> textureUV_;
+    std::vector<SDL_FPoint> localVertices_;
+    std::vector<SDL_FPoint> localOutlineVertices_;
 
-    mutable std::vector<SDL_Vertex> vertices_;
-    mutable std::vector<SDL_Vertex> outlineVertices_;
+    mutable std::vector<SDL_FPoint> vertices_;
+    mutable std::vector<SDL_FPoint> outlineVertices_;
     mutable bool shapeDirty_ = true;
     mutable bool outlineDirty_ = true;
-    mutable unsigned viewId_ = 0; // С этим работа позже, пока не трогать
+    mutable unsigned viewId_ = 0;
 
 private:
     void draw(RenderTarget &target) const override
@@ -129,8 +128,8 @@ private:
 
             viewId_ = target.getViewId();
         }
-
-        target.drawShape(vertices_, outlineVertices_, texture_);
+        target.drawShape(texture_, vertices_, fillColor_, textureUV_);
+        target.drawShape(outlineVertices_, outlineColor_);
     }
 
     void updateLocalShape()
@@ -158,78 +157,44 @@ private:
 
         localVertices_.clear();
         localVertices_.reserve(count * 3);
+        textureUV_.clear();
+        textureUV_.reserve(count * 3);
 
         // Хелпер для создания вершины: Геометрия + UV + Цвет в один присест - 2-й проход O(N)
-        auto createFullVertex = [&](SDL_FPoint p, const SDL_FColor &color) -> SDL_Vertex
+        auto createUV = [&](SDL_FPoint p) -> SDL_FPoint
         {
-            SDL_Vertex v;
-            v.position = p;
-            v.color = color;
+            SDL_FPoint uv;
 
             // Коэффициент положения точки в фигуре (0.0 - 1.0)
             float ratioX = (localBounds_.w != 0.0f) ? (p.x - localBounds_.x) / localBounds_.w : 0.0f;
             float ratioY = (localBounds_.h != 0.0f) ? (p.y - localBounds_.y) / localBounds_.h : 0.0f;
 
             // Накладываем textureRect и нормализуем для GPU
-            v.tex_coord.x = (textureRect_.x + ratioX * textureRect_.w) / texW;
-            v.tex_coord.y = (textureRect_.y + ratioY * textureRect_.h) / texH;
+            uv.x = (textureRect_.x + ratioX * textureRect_.w) / texW;
+            uv.y = (textureRect_.y + ratioY * textureRect_.h) / texH;
 
-            return v;
+            return uv;
         };
 
         // 2. ГЕНЕРАЦИЯ ЗАЛИВКИ (Triangle Fan)
         SDL_FPoint center = {localBounds_.x + localBounds_.w / 2.0f, localBounds_.y + localBounds_.h / 2.0f};
-        SDL_Vertex centerVert = createFullVertex(center, fillColor_);
+        // ShapeVertex centerVert = createFullVertex(center);
+        SDL_FPoint centerVert = center;
+        SDL_FPoint centerUV = createUV(center);
 
         for (size_t i = 0; i < count; ++i)
         {
             localVertices_.push_back(centerVert);
-            localVertices_.push_back(createFullVertex(getPoint(i), fillColor_));
-            localVertices_.push_back(createFullVertex(getPoint((i + 1) % count), fillColor_));
+            localVertices_.push_back(getPoint(i));
+            localVertices_.push_back(getPoint((i + 1) % count));
+
+            textureUV_.push_back(centerUV);
+            textureUV_.push_back(createUV(getPoint(i)));
+            textureUV_.push_back(createUV(getPoint((i + 1) % count)));
         }
         shapeDirty_ = true;
     }
 
-    // void updateLocalShape()
-    // {
-    //     size_t count = getPointCount();
-    //     if (count < 3)
-    //     {
-    //         localVertices_.clear();
-    //         localOutlineVertices_.clear();
-    //         return;
-    //     }
-    //     localVertices_.clear();
-    //     localVertices_.reserve(count * 3);
-
-    //     // 1. ВЫЧИСЛЕНИЕ ГРАНИЦ (localBounds_)
-    //     updateLocalBounds();
-
-    //     // Хелпер для создания вершины с UV-координатами
-    //     auto createVertex = [&](SDL_FPoint p, SDL_FColor color) -> SDL_Vertex
-    //     {
-    //         SDL_Vertex v;
-    //         v.position = p;
-    //         v.color = color;
-    //         v.tex_coord.x = (localBounds_.w != 0) ? (p.x - localBounds_.x) / localBounds_.w : 0.0f;
-    //         v.tex_coord.y = (localBounds_.h != 0) ? (p.y - localBounds_.y) / localBounds_.h : 0.0f;
-    //         return v;
-    //     };
-
-    //     // 2. ГЕНЕРАЦИЯ ЗАЛИВКИ (localVertices_) - Triangle Fan
-    //     SDL_FPoint center = {localBounds_.x + localBounds_.w / 2.0f, localBounds_.y + localBounds_.h / 2.0f};
-    //     SDL_Vertex centerVert = createVertex(center, fillColor_);
-
-    //     for (size_t i = 0; i < count; ++i)
-    //     {
-    //         localVertices_.push_back(centerVert);
-    //         localVertices_.push_back(createVertex(getPoint(i), fillColor_));
-    //         localVertices_.push_back(createVertex(getPoint((i + 1) % count), fillColor_));
-    //     }
-
-    //     // Сбрасываем флаги, помечаем для трансформации
-    //     shapeDirty_ = true;
-    // }
     void updateLocalOutline()
     {
         size_t count = getPointCount();
@@ -240,16 +205,6 @@ private:
             return;
         }
 
-        // Хелпер для создания вершины с UV-координатами
-        auto createVertex = [&](SDL_FPoint p, SDL_FColor color) -> SDL_Vertex
-        {
-            SDL_Vertex v;
-            v.position = p;
-            v.color = color;
-            v.tex_coord.x = (localBounds_.w != 0) ? (p.x - localBounds_.x) / localBounds_.w : 0.0f;
-            v.tex_coord.y = (localBounds_.h != 0) ? (p.y - localBounds_.y) / localBounds_.h : 0.0f;
-            return v;
-        };
         // Нормализация векторов ребер
         auto normalize = [](SDL_FPoint v)
         {
@@ -307,13 +262,13 @@ private:
                 SDL_FPoint inner2 = pNext;
 
                 // Формируем 2 треугольника (Quad) для сегмента контура
-                localOutlineVertices_.push_back(createVertex(inner1, outlineColor_));
-                localOutlineVertices_.push_back(createVertex(outer1, outlineColor_));
-                localOutlineVertices_.push_back(createVertex(outer2, outlineColor_));
+                localOutlineVertices_.push_back(inner1);
+                localOutlineVertices_.push_back(outer1);
+                localOutlineVertices_.push_back(outer2);
 
-                localOutlineVertices_.push_back(createVertex(inner1, outlineColor_));
-                localOutlineVertices_.push_back(createVertex(outer2, outlineColor_));
-                localOutlineVertices_.push_back(createVertex(inner2, outlineColor_));
+                localOutlineVertices_.push_back(inner1);
+                localOutlineVertices_.push_back(outer2);
+                localOutlineVertices_.push_back(inner2);
             }
         }
 
@@ -339,20 +294,6 @@ private:
                 maxY = p.y;
         }
         localBounds_ = {minX, minY, maxX - minX, maxY - minY};
-    }
-    void updateFillColors()
-    {
-        for (auto &v : localVertices_)
-            v.color = fillColor_;
-        for (auto &v : vertices_)
-            v.color = fillColor_;
-    }
-    void updateOutlineColors()
-    {
-        for (auto &v : localOutlineVertices_)
-            v.color = outlineColor_;
-        for (auto &v : outlineVertices_)
-            v.color = outlineColor_;
     }
     void updateTexturePoints()
     {
@@ -384,35 +325,11 @@ private:
         };
 
         // Обновляем локальный "эталон"
-        for (size_t i = 0; i < localVertices_.size(); ++i)
-        {
-            localVertices_[i].tex_coord = calculateUV(localVertices_[i].position);
-        }
-
-        // Синхронизируем с массивом для отрисовки (чтобы не пересчитывать матрицы, если изменился только UV)
-        if (vertices_.size() == localVertices_.size())
-        {
-            for (size_t i = 0; i < vertices_.size(); ++i)
-                vertices_[i].tex_coord = localVertices_[i].tex_coord;
-        }
+        textureUV_.clear();
+        textureUV_.reserve(localVertices_.size());
+        for (auto &p : localVertices_)
+            textureUV_.push_back(calculateUV(p));
     }
-    // void updateTexturePoints()
-    // {
-    //     auto updateTexCoord = [&](SDL_Vertex vertex) -> SDL_FPoint
-    //     {
-    //         SDL_FPoint tex_coord;
-    //         tex_coord.x = (localBounds_.w != 0) ? (vertex.position.x - localBounds_.x) / localBounds_.w : 0.0f;
-    //         tex_coord.y = (localBounds_.h != 0) ? (vertex.position.y - localBounds_.y) / localBounds_.h : 0.0f;
-    //         return tex_coord;
-    //     };
-    //     for (size_t i = 0; i < localVertices_.size(); ++i)
-    //         localVertices_[i].tex_coord = updateTexCoord(localVertices_[i]);
-    //     if (vertices_.size() == localVertices_.size())
-    //     {
-    //         for (size_t i = 0; i < vertices_.size(); ++i)
-    //             vertices_[i].tex_coord = localVertices_[i].tex_coord;
-    //     }
-    // }
 
     void updateVertices(const Matrix3x3 &matrix) const
     {
