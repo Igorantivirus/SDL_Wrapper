@@ -8,7 +8,6 @@
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_stdinc.h>
 
-
 #include <SDLWrapper/ObjectBase/Drawable.hpp>
 #include <SDLWrapper/ObjectBase/Transformable.hpp>
 #include <SDLWrapper/Texture.hpp>
@@ -77,10 +76,16 @@ public:
     {
         if (!renderer_)
             return;
-
         const SDL_Texture *sdlTex = getRawTextureFromTexture(texture);
         SDL_RenderGeometry(renderer_.get(), const_cast<SDL_Texture *>(sdlTex), fillVertices.data(), static_cast<int>(fillVertices.size()), nullptr, 0);
         SDL_RenderGeometry(renderer_.get(), nullptr, outlineVertices.data(), static_cast<int>(outlineVertices.size()), nullptr, 0);
+    }
+    void drawShape(const SDL_Vertex *vertices, const int cnt, const Texture *texture, const int *indices, const int indCnt)
+    {
+        if (!renderer_)
+            return;
+        const SDL_Texture *sdlTex = getRawTextureFromTexture(texture);
+        SDL_RenderGeometry(renderer_.get(), const_cast<SDL_Texture *>(sdlTex), vertices, cnt, indices, indCnt);
     }
 
     const View &getView() const
