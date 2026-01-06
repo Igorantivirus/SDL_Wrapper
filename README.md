@@ -12,15 +12,15 @@
 
 - SFML-like API and structure.
 - OOP-first: SDL calls are hidden behind classes.
-- Minimal:SDLWrapper` builds as a static library and does not build SDL3 for you.
+- Minimal: `SDLWrapper` builds as a static library and does not build SDL3 for you.
 - Windows (MSVC) and Android (NDK); Linux needs verification.
 
 ## Dependencies
 
 - Language: C++20+.
 - SDL3 + SDL3_image:
-  - BuildingSDLWrapper` requires headers only (provided viaSDL3_INC_DIR` andSDL3_IMAGE_INC_DIR`).
-  - UsingSDLWrapper` in your app still requires linking against SDL3 and SDL3_image (and havingfind_package(SDL3 CONFIG)` /find_package(SDL3_image CONFIG)` working).
+  - Building `SDLWrapper` requires headers only (provided via `SDL3_INC_DIR` and `SDL3_IMAGE_INC_DIR`).
+  - Using `SDLWrapper` in your app still requires linking against SDL3 and SDL3_image (and having `find_package(SDL3 CONFIG)` / `find_package(SDL3_image CONFIG)` working).
 
 ## Build and install
 
@@ -36,8 +36,8 @@ cd SDLWrapper
 ### 2) Configure
 
 You must provide SDL header paths:
--SDL3_INC_DIR` - path to.../SDL3/include`
--SDL3_IMAGE_INC_DIR` - path to.../SDL3_image/include` (or wherever SDL3_image headers are located)
+- `SDL3_INC_DIR` - path to `.../SDL3/include`
+- `SDL3_IMAGE_INC_DIR` - path to `.../SDL3_image/include` (or wherever `SDL3_image` headers are located)
 
 #### Windows (MSVC)
 

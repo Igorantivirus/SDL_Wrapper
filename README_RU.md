@@ -12,15 +12,15 @@
 
 - SFML-like синтаксис и структура.
 - Чистый ООП: прямые вызовы SDL спрятаны за классами.
-- Минимализм:SDLWrapper` собирается как статическая библиотека и не собирает SDL3 за вас.
+- Минимализм: `SDLWrapper` собирается как статическая библиотека и не собирает SDL3 за вас.
 - Windows (MSVC) и Android (NDK); Linux требует проверки.
 
 ## Зависимости
 
 - Язык: C++20+.
 - SDL3 и SDL3_image:
-  - Для сборкиSDLWrapper` нужны только заголовки (пути задаются черезSDL3_INC_DIR` иSDL3_IMAGE_INC_DIR`).
-  - Для использованияSDLWrapper` в своём приложении нужно линковаться с SDL3 и SDL3_image (и чтобыfind_package(SDL3 CONFIG)` /find_package(SDL3_image CONFIG)` находили их).
+  - Для сборки `SDLWrapper` нужны только заголовки (пути задаются через `SDL3_INC_DIR` и `SDL3_IMAGE_INC_DIR`).
+  - Для использования `SDLWrapper` в своём приложении нужно линковаться с SDL3 и SDL3_image (и чтобы `find_package(SDL3 CONFIG)` / `find_package(SDL3_image CONFIG)` находили их).
 
 ## Сборка и установка
 
@@ -36,8 +36,8 @@ cd SDLWrapper
 ### 2) Конфигурация
 
 При конфигурации нужно указать пути к заголовкам SDL:
--SDL3_INC_DIR` - путь к.../SDL3/include`
--SDL3_IMAGE_INC_DIR` - путь к.../SDL3_image/include` (или к каталогу, где лежат заголовки SDL3_image)
+- `SDL3_INC_DIR` - путь к `.../SDL3/include`
+- `SDL3_IMAGE_INC_DIR` - путь к `.../SDL3_image/include` (или к каталогу, где лежат заголовки `SDL3_image`)
 
 #### Windows (MSVC)
 
