@@ -15,6 +15,19 @@
 - Минимализм: `SDLWrapper` собирается как статическая библиотека и не собирает SDL3 за вас.
 - Windows (MSVC) и Android (NDK); Linux требует проверки.
 
+## Что реализовано
+
+- Рендер/окно: `RenderTarget`, `RenderWindow`, `View`, `VideoMode`
+- Фигуры: `Shape`, `RectangleShape`, `CircleShape`, `EllipseShape`
+- Текстуры/спрайты: `Texture` (загрузка через SDL3_image), `Sprite`
+- Трансформации: `Transformable`
+- Вспомогательные операторы/типы: `Operators` (Rect/Point и др.), `Convert`, `Colors`
+
+## Планируется
+
+- `Text`
+- `Image`
+
 ## Зависимости
 
 - Язык: C++20+.

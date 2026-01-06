@@ -15,6 +15,19 @@
 - Minimal: `SDLWrapper` builds as a static library and does not build SDL3 for you.
 - Windows (MSVC) and Android (NDK); Linux needs verification.
 
+## Implemented
+
+- Rendering/window: `RenderTarget`, `RenderWindow`, `View`, `VideoMode`
+- Shapes: `Shape`, `RectangleShape`, `CircleShape`, `EllipseShape`
+- Textures/sprites: `Texture` (loaded via SDL3_image), `Sprite`
+- Transforms: `Transformable`
+- Helper operators/types: `Operators` (Rect/Point etc.), `Convert`, `Colors`
+
+## Planned
+
+- `Text`
+- `Image`
+
 ## Dependencies
 
 - Language: C++20+.
