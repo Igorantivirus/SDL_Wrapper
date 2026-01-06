@@ -1,7 +1,0 @@
-CompileFlags:
-  CompilationDatabase: build
-  Remove: ['-std=*', '/std:*']
-  Add: ['/std:c++latest', '/Zc:__cplusplus', '/EHsc']
-
-Diagnostics:
-  Suppress: ['builtin_definition']
