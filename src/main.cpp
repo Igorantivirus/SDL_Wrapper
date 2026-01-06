@@ -9,7 +9,6 @@
 #include <SDL3/SDL_log.h>
 #include <SDL3/SDL_oldnames.h>
 #include <SDL3/SDL_pixels.h>
-#include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_scancode.h>
 #ifndef SDL_MAIN_USE_CALLBACKS
@@ -30,6 +29,7 @@
 #include <SDLWrapper/Texture.hpp>
 
 using namespace sdl3::operators;
+using sdl3::Vector2f;
 
 sdl3::RenderWindow window;
 sdl3::View view;
@@ -133,7 +133,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
             window.setFullScreen(!window.isFullScreen());
             return SDL_APP_CONTINUE;
         }
-        SDL_FPoint pos = {};
+        Vector2f pos = {};
         if (event->key.key == SDLK_W)
             pos.y -= 1;
         else if (event->key.key == SDLK_A)
@@ -159,7 +159,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 
         if (pos.x != 0.f || pos.y != 0.f)
         {
-            SDL_FPoint center = view.getCenterPosition();
+            Vector2f center = view.getCenterPosition();
             view.setCenterPosition({center.x + pos.x, center.y + pos.y});
             window.setView(view);
             return SDL_APP_CONTINUE;
@@ -183,26 +183,26 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
             }
             else if (event->key.scancode == SDL_SCANCODE_KP_PLUS)
             {
-                // SDL_FPoint scale = view.getZoom();
+                // Vector2f scale = view.getZoom();
                 // scale.x *= 1.1f;
                 // scale.y *= 1.1f;
                 // view.setZoom(scale);
                 // window.setView(view);
 
-                SDL_FPoint scale = sprite2.getScale();
+                Vector2f scale = sprite2.getScale();
                 scale.x *= 1.1f;
                 scale.y *= 1.1f;
                 sprite2.setScale(scale);
             }
             else if (event->key.scancode == SDL_SCANCODE_KP_MINUS)
             {
-                // SDL_FPoint scale = view.getZoom();
+                // Vector2f scale = view.getZoom();
                 // scale.x /= 1.1f;
                 // scale.y /= 1.1f;
                 // view.setZoom(scale);
                 // window.setView(view);
 
-                SDL_FPoint scale = sprite2.getScale();
+                Vector2f scale = sprite2.getScale();
                 scale.x /= 1.1f;
                 scale.y /= 1.1f;
                 sprite2.setScale(scale);

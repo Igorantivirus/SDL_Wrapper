@@ -18,10 +18,8 @@ set_target_properties(SDLWrapper PROPERTIES
 # Все исходные файлы
 target_sources(SDLWrapper PRIVATE
     src/CircleShape.cpp
-    src/Convert.cpp
+    src/Colors.cpp
     src/EllipseShape.cpp
-    src/Matrix3x3.cpp
-    src/Operators.cpp
     src/RectangleShape.cpp
     src/RenderMeneger.cpp
     src/RenderTarget.cpp
@@ -30,7 +28,6 @@ target_sources(SDLWrapper PRIVATE
     src/Sprite.cpp
     src/Texture.cpp
     src/Transformable.cpp
-    src/VectorMath.cpp
     src/VideoMode.cpp
     src/View.cpp
 )
