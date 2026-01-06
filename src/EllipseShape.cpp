@@ -7,19 +7,19 @@
 namespace sdl3
 {
 
-EllipseShape::EllipseShape(const SDL_FPoint &radii, const std::size_t pointCount)
+EllipseShape::EllipseShape(const Vector2f &radii, const std::size_t pointCount)
     : radii_{radii}, pointCount_(pointCount)
 {
     updateLocalGeometry();
 }
 
-void EllipseShape::setRadii(const SDL_FPoint &radii)
+void EllipseShape::setRadii(const Vector2f &radii)
 {
     radii_ = radii;
     updateLocalGeometry();
 }
 
-const SDL_FPoint &EllipseShape::getRadii() const
+const Vector2f &EllipseShape::getRadii() const
 {
     return radii_;
 }
@@ -35,7 +35,7 @@ std::size_t EllipseShape::getPointCount() const
     return pointCount_;
 }
 
-SDL_FPoint EllipseShape::getPoint(const std::size_t index) const
+Vector2f EllipseShape::getPoint(const std::size_t index) const
 {
     const float angle = static_cast<float>(index) * 2.0f * SDL_PI_F / static_cast<float>(pointCount_);
     return {

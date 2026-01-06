@@ -30,7 +30,7 @@ std::size_t CircleShape::getPointCount() const
     return pointCount_;
 }
 
-SDL_FPoint CircleShape::getPoint(const std::size_t index) const
+Vector2f CircleShape::getPoint(const std::size_t index) const
 {
     const float angle = static_cast<float>(index) * 2.0f * SDL_PI_F / static_cast<float>(pointCount_);
     return {
