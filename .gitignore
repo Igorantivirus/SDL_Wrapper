@@ -7,3 +7,4 @@ build
 CMakePresets.json
 
 src/main.cpp
+build_all.bat
