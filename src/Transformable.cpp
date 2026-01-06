@@ -7,7 +7,7 @@
 namespace sdl3
 {
 
-const Matrix3x3 &Transformable::getTransformMatrix() const
+const Matrix3x3<float> &Transformable::getTransformMatrix() const
 {
     if (m_dirty)
     {
@@ -33,7 +33,7 @@ const Matrix3x3 &Transformable::getTransformMatrix() const
     return matrix_;
 }
 
-void Transformable::setPosition(const SDL_FPoint &position)
+void Transformable::setPosition(const Vector2f &position)
 {
     if (position_.x == position.x && position_.y == position.y)
         return;
@@ -41,7 +41,7 @@ void Transformable::setPosition(const SDL_FPoint &position)
     m_dirty = true;
 }
 
-void Transformable::setOriginKeepPosition(const SDL_FPoint &newOrigin)
+void Transformable::setOriginKeepPosition(const Vector2f &newOrigin)
 {
     if (origin_.x == newOrigin.x && origin_.y == newOrigin.y)
         return;
@@ -63,7 +63,7 @@ void Transformable::setOriginKeepPosition(const SDL_FPoint &newOrigin)
     m_dirty = true;
 }
 
-void Transformable::setOrigin(const SDL_FPoint &origin)
+void Transformable::setOrigin(const Vector2f &origin)
 {
     if (origin_.x == origin.x && origin_.y == origin.y)
         return;
@@ -71,7 +71,7 @@ void Transformable::setOrigin(const SDL_FPoint &origin)
     m_dirty = true;
 }
 
-void Transformable::setScale(const SDL_FPoint &scale)
+void Transformable::setScale(const Vector2f &scale)
 {
     if (scale_.x == scale.x && scale_.y == scale.y)
         return;
@@ -105,7 +105,7 @@ void Transformable::rotate(const float angle)
     setRotation(rotation_ + angle);
 }
 
-void Transformable::move(const SDL_FPoint &offset)
+void Transformable::move(const Vector2f &offset)
 {
     if (offset.x == 0.f && offset.y == 0.f)
         return;
@@ -114,7 +114,7 @@ void Transformable::move(const SDL_FPoint &offset)
     m_dirty = true;
 }
 
-void Transformable::scale(const SDL_FPoint &factor)
+void Transformable::scale(const Vector2f &factor)
 {
     if (factor.x == 1.f && factor.y == 1.f)
         return;
@@ -141,17 +141,17 @@ void Transformable::reset()
     m_dirty = true;
 }
 
-const SDL_FPoint &Transformable::getPosition() const
+const Vector2f &Transformable::getPosition() const
 {
     return position_;
 }
 
-const SDL_FPoint &Transformable::getOrigin() const
+const Vector2f &Transformable::getOrigin() const
 {
     return origin_;
 }
 
-const SDL_FPoint &Transformable::getScale() const
+const Vector2f &Transformable::getScale() const
 {
     return scale_;
 }
