@@ -1,80 +1,117 @@
-<h1 align="center">Crossplatform SDL3+RmlUi example</h1>
+<h1 align="center">SDLWrapper (SDL3 C++ Wrapper)</h1>
 
-## Crossplatform SDL3+RmlUi project
+<p align="center">
+  <b>A lightweight object-oriented wrapper over SDL3 with an SFML-like API.</b>
+</p>
 
 [![Russian version](https://img.shields.io/badge/Russian%20version-blue)](README_RU.md)
+![C++](https://img.shields.io/badge/C++-20-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-## Description
+## Features
 
-Lightweight crossplatform С++ project with SDL3 + RmlUi libraries with light link libraries for Android
-
-# Platform Features
-
-1. Windows
-   * Static linking of the library is used
-   * The SDL3 libraries should already be statically compiled and are on the way `EXTERNAL_DIR` (See `Инструкция по сборке`)
-   * All Cmake see in `cmake/AppWindows.cmake`
-2. Android
-   * Build via Cmake + Ninja из Android Studio
-   * All Cmake see in `cmake/AppAndroid.cmake` 
-3. Linux
-   * There is currently no cmake build file for Linux, you can send us a pull request with the file `AppLinux.cmake` if you are sure that it works.
-
+- SFML-like API and structure.
+- OOP-first: SDL calls are hidden behind classes.
+- Minimal:SDLWrapper` builds as a static library and does not build SDL3 for you.
+- Windows (MSVC) and Android (NDK); Linux needs verification.
 
 ## Dependencies
 
-Programming language: **С++23**
+- Language: C++20+.
+- SDL3 + SDL3_image:
+  - BuildingSDLWrapper` requires headers only (provided viaSDL3_INC_DIR` andSDL3_IMAGE_INC_DIR`).
+  - UsingSDLWrapper` in your app still requires linking against SDL3 and SDL3_image (and havingfind_package(SDL3 CONFIG)` /find_package(SDL3_image CONFIG)` working).
 
-Libraries:
-* [RmlUi](https://github.com/mikke89/RmlUi) - library for Ui
-* [FreeType](https://freetype.org/) - supporting fonts for RmlUi
-* [SDL3, SDL3_image](https://github.com/libsdl-org) - Graphic library (project use *.aar* files from official SDL3 repos)
-* [SDL_gfx](https://github.com/sabdul-khabir/SDL3_gfx) - Graphics primitives for SDL3
+## Build and install
 
-## Install and Run
+Below is a simple CMake workflow for configure, build, and install.
 
-### Preliminary requirements
+### 1) Clone
 
-#### For Windows
-* Use **С++23**
-* Cmake **3.22**+
+```bash
+git clone https://github.com/Igorantivirus/SDLWrapper
+cd SDLWrapper
+```
 
-#### For Android
+### 2) Configure
 
-* SDK - **35**
-* NDK - **25.1.8937393**+
-* Cmake **3.22**+
+You must provide SDL header paths:
+-SDL3_INC_DIR` - path to.../SDL3/include`
+-SDL3_IMAGE_INC_DIR` - path to.../SDL3_image/include` (or wherever SDL3_image headers are located)
 
-### Assembly instructions
+#### Windows (MSVC)
 
-#### Important!
-Cmake variable EXTERNAL_DIR it must point to the directory where the libraries are located: RmlUi, SDL3 and others
+```powershell
+cmake -S . -B build/win -G "Ninja Multi-Config"
+  -DBUILD_SHARED_LIBS=OFF
+  -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded$<$<CONFIG:Debug>:Debug>"
+  -DSDL3_INC_DIR="D:/path/to/SDL3/include"
+  -DSDL3_IMAGE_INC_DIR="D:/path/to/SDL3_image/include"
+```
 
-1. **Clone the repository**
-   ```sh
-   git clone https://github.com/Igorantivirus/Crossplatform-Example-SDL3-RmlUi-project
-   cd Crossplatform-Example-SDL3-RmlUi-project
-   ```
+If you want/MD`, use:
+```powershell
+cmake -S . -B build/win -G "Ninja Multi-Config"
+  -DBUILD_SHARED_LIBS=OFF
+  -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded$<$<CONFIG:Debug>:DebugDLL>"
+  -DSDL3_INC_DIR="D:/path/to/SDL3/include"
+  -DSDL3_IMAGE_INC_DIR="D:/path/to/SDL3_image/include"
+```
 
-2. **Configure CMake**
+#### Android (NDK)
 
-    #### For Android
-    * In `build.gradle` file change argument `"-DEXTERNAL_DIR=\"LIBRARIES_PATH\""` for Cmake
-    * Run synch gradle files throw `Ctrl+Shift+O`
-       
-    #### For Windows
-    ```sh
-    cmake -B build -DCMAKE_BUILD_TYPE=Release -DEXTERNAL_DIR="LIBRARIES_PATH" -DUSE_CONSOLE=FALSE
-    ```
+```powershell
+cmake -S . -B build/android-arm64 -G "Ninja Multi-Config"
+  -DCMAKE_TOOLCHAIN_FILE=".../Android/Sdk/ndk/26.1.10909125/build/cmake/android.toolchain.cmake"
+  -DANDROID_NDK=".../Android/Sdk/ndk/26.1.10909125"
+  -DANDROID_PLATFORM="android-24"
+  -DANDROID_ABI="arm64-v8a"
+  -DBUILD_SHARED_LIBS=OFF
+  -DSDL3_INC_DIR="D:/path/to/SDL3/include"
+  -DSDL3_IMAGE_INC_DIR="D:/path/to/SDL3_image/include"
+```
 
-3. **Build & Run project** 
-   
-    #### For Android
-    Run project in emulator or in Your device
-    #### For Widnows
-    ```sh
-    cmake --build build --config Release
-    ```
+### 3) Build
 
-## License 
-MIT License
+```powershell
+cmake --build build/win --config Release
+cmake --build build/android-arm64 --config Release
+```
+
+### 4) Install
+
+```powershell
+cmake --install build/win --config Release --prefix "D:/path/to/install/SDLWrapper/win/Release"
+cmake --install build/android-arm64 --config Release --prefix "D:/path/to/install/SDLWrapper/arm64-v8a/Release"
+```
+After installation, `find_package(SDLWrapper CONFIG REQUIRED)` is available.
+
+## Using in your project (CMake)
+
+```cmake
+# 1) SDLWrapper install prefix
+list(APPEND CMAKE_PREFIX_PATH "D:/path/to/install/SDLWrapper/win/Release")
+
+# 2) SDL3 and SDL3_image (must be installed with their CMake config files)
+find_package(SDL3 CONFIG REQUIRED)
+find_package(SDL3_image CONFIG REQUIRED)
+
+# 3) SDLWrapper
+find_package(SDLWrapper CONFIG REQUIRED)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+  SDLWrapper::SDLWrapper
+  SDL3::SDL3-static
+  SDL3_image::SDL3_image-static
+)
+```
+
+## Platform support
+
+- Windows: MSVC 2022, both /MD and /MT.
+- Android: tested with NDK 26.1.10909125, API 24.
+- Linux: needs verification.
+
+## License
+
+MIT License.
