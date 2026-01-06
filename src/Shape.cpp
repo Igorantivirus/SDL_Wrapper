@@ -81,7 +81,7 @@ void Shape::updateLocalGeometry()
 void Shape::draw(RenderTarget &target) const
 {
     const bool viewDirty = viewID_ != target.getViewId();
-    const bool transformDirty = m_dirty;
+    const bool transformDirty = isGeometryDirty();
 
     const bool needFillUpdate = transformDirty || shapeDirty_ || viewDirty;
     const bool needOutlineUpdate = transformDirty || outlineDirty_ || viewDirty;
@@ -99,6 +99,8 @@ void Shape::draw(RenderTarget &target) const
             updateOutlineVertices(matrix);
 
         viewID_ = target.getViewId();
+
+        updateGeometryVersion();
     }
 
     target.drawShape(texture_,

@@ -77,7 +77,7 @@ void Sprite::draw(RenderTarget &target) const
     if (!texture_)
         return;
 
-    if (viewID_ != target.getViewId() || m_dirty || dirty_)
+    if (viewID_ != target.getViewId() || isGeometryDirty() || dirty_)
     {
         Matrix3x3<float> matrix = target.getView().getTransformMatrix() * getTransformMatrix();
         const Vector2f screenCenter = target.getTargetCenter();
@@ -85,6 +85,7 @@ void Sprite::draw(RenderTarget &target) const
         matrix.ty += screenCenter.y;
         updateVertices(matrix);
         viewID_ = target.getViewId();
+        updateGeometryVersion();
     }
     target.drawShape(texture_, vertices_, 4, textureUV_, 4, color_, indices_, 6);
 }

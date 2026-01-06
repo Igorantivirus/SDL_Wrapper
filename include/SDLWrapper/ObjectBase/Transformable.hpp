@@ -1,7 +1,7 @@
 #pragma once
 
-#include <SDLWrapper/Names.hpp>
 #include <SDLWrapper/Math/Matrix3x3.hpp>
+#include <SDLWrapper/Names.hpp>
 
 namespace sdl3
 {
@@ -37,9 +37,17 @@ protected:
     Vector2f scale_ = {1.0f, 1.0f};
     float rotation_ = 0.0f;
 
+private:
     mutable Matrix3x3<float> matrix_;
-    mutable bool m_dirty = true;
+
+    mutable unsigned m_currentVersion_ = 0;  // Текущая обновляющаяся версия
+    mutable unsigned m_matrixVersion_ = 0;   // Версия матрицы
+    mutable unsigned m_geometryVersion_ = 0; // Версия геометрии в целом
+
+protected:
+    unsigned getVersion() const;
+    bool isGeometryDirty() const;
+    void updateGeometryVersion() const;
 };
 
 } // namespace sdl3
-

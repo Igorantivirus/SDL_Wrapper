@@ -7,9 +7,24 @@
 namespace sdl3
 {
 
+unsigned Transformable::getVersion() const
+{
+    return m_currentVersion_;
+}
+
+bool Transformable::isGeometryDirty() const
+{
+    return m_geometryVersion_ != m_currentVersion_;
+}
+
+void Transformable::updateGeometryVersion() const
+{
+    m_geometryVersion_ = m_currentVersion_;
+}
+
 const Matrix3x3<float> &Transformable::getTransformMatrix() const
 {
-    if (m_dirty)
+    if (m_matrixVersion_ != m_currentVersion_)
     {
         float angle = rotation_ * (SDL_PI_F / 180.0f);
         float cosA = std::cos(angle);
@@ -28,7 +43,7 @@ const Matrix3x3<float> &Transformable::getTransformMatrix() const
         matrix_.tx = -origin_.x * sxc + origin_.y * sys + position_.x;
         matrix_.ty = -origin_.x * sxs - origin_.y * syc + position_.y;
 
-        m_dirty = false;
+        m_matrixVersion_ = m_currentVersion_;
     }
     return matrix_;
 }
@@ -38,7 +53,7 @@ void Transformable::setPosition(const Vector2f &position)
     if (position_.x == position.x && position_.y == position.y)
         return;
     position_ = position;
-    m_dirty = true;
+    ++m_currentVersion_;
 }
 
 void Transformable::setOriginKeepPosition(const Vector2f &newOrigin)
@@ -60,7 +75,7 @@ void Transformable::setOriginKeepPosition(const Vector2f &newOrigin)
     position_.y += rdy;
 
     origin_ = newOrigin;
-    m_dirty = true;
+    ++m_currentVersion_;
 }
 
 void Transformable::setOrigin(const Vector2f &origin)
@@ -68,7 +83,7 @@ void Transformable::setOrigin(const Vector2f &origin)
     if (origin_.x == origin.x && origin_.y == origin.y)
         return;
     origin_ = origin;
-    m_dirty = true;
+    ++m_currentVersion_;
 }
 
 void Transformable::setScale(const Vector2f &scale)
@@ -77,7 +92,7 @@ void Transformable::setScale(const Vector2f &scale)
         return;
     scale_.x = std::abs(scale.x);
     scale_.y = std::abs(scale.y);
-    m_dirty = true;
+    ++m_currentVersion_;
 }
 
 void Transformable::setUniformScale(const float scale)
@@ -87,7 +102,7 @@ void Transformable::setUniformScale(const float scale)
     float absScale = std::abs(scale);
     scale_.x = absScale;
     scale_.y = absScale;
-    m_dirty = true;
+    ++m_currentVersion_;
 }
 
 void Transformable::setRotation(const float rotation)
@@ -95,7 +110,7 @@ void Transformable::setRotation(const float rotation)
     if (rotation == rotation_)
         return;
     rotation_ = std::fmod(rotation, 360.0f);
-    m_dirty = true;
+    ++m_currentVersion_;
 }
 
 void Transformable::rotate(const float angle)
@@ -111,7 +126,7 @@ void Transformable::move(const Vector2f &offset)
         return;
     position_.x += offset.x;
     position_.y += offset.y;
-    m_dirty = true;
+    ++m_currentVersion_;
 }
 
 void Transformable::scale(const Vector2f &factor)
@@ -120,7 +135,7 @@ void Transformable::scale(const Vector2f &factor)
         return;
     scale_.x *= std::abs(factor.x);
     scale_.y *= std::abs(factor.y);
-    m_dirty = true;
+    ++m_currentVersion_;
 }
 
 void Transformable::uniformeScale(const float factor)
@@ -129,7 +144,7 @@ void Transformable::uniformeScale(const float factor)
         return;
     scale_.x *= std::abs(factor);
     scale_.y *= std::abs(factor);
-    m_dirty = true;
+    ++m_currentVersion_;
 }
 
 void Transformable::reset()
@@ -138,7 +153,7 @@ void Transformable::reset()
     origin_ = {0.0f, 0.0f};
     scale_ = {1.0f, 1.0f};
     rotation_ = 0.0f;
-    m_dirty = true;
+    ++m_currentVersion_;
 }
 
 const Vector2f &Transformable::getPosition() const
