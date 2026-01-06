@@ -1,0 +1,11 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# Чтобы find_package(SDLWrapper) работал, он должен найти зависимости
+find_dependency(SDL3)
+find_dependency(SDL3_image)
+
+include("${CMAKE_CURRENT_LIST_DIR}/SDLWrapperTargets.cmake")
+
+check_required_components(SDLWrapper)

@@ -1,0 +1,160 @@
+cmake_minimum_required(VERSION 3.20)
+
+project(SDLWrapper
+  VERSION 0.1.0
+  LANGUAGES CXX
+)
+
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+# ===== Options =====
+option(SDLWRAPPER_BUILD_SHARED "Build SDLWrapper as shared library" OFF)
+
+# Если хочешь принудительно линковаться с SDL3 static (как у тебя сейчас) — оставь ON.
+# Если OFF — будем пытаться линковать SDL3 shared (SDL3::SDL3).
+option(SDLWRAPPER_LINK_SDL3_STATIC "Link SDL3 statically (SDL3::SDL3-static)" ON)
+
+# ===== Library =====
+set(_sdlwrapper_libtype STATIC)
+if(SDLWRAPPER_BUILD_SHARED)
+  set(_sdlwrapper_libtype SHARED)
+endif()
+
+add_library(SDLWrapper ${_sdlwrapper_libtype}
+    src/CircleShape.cpp
+    src/Convert.cpp
+    src/EllipseShape.cpp
+    src/Log.cpp
+    src/Matrix3x3.cpp
+    src/Operators.cpp
+    src/RectangleShape.cpp
+    src/RenderMeneger.cpp
+    src/RenderTarget.cpp
+    src/RenderWindow.cpp
+    src/Shape.cpp
+    src/Sprite.cpp
+    src/Texture.cpp
+    src/Transformable.cpp
+    src/VectorMath.cpp
+    src/VideoMode.cpp
+    src/View.cpp
+)
+
+add_library(SDLWrapper::SDLWrapper ALIAS SDLWrapper)
+
+target_compile_features(SDLWrapper PUBLIC cxx_std_20)
+set_target_properties(SDLWrapper PROPERTIES
+  CXX_EXTENSIONS OFF
+  POSITION_INDEPENDENT_CODE ON
+)
+
+target_include_directories(SDLWrapper
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+# ===== Dependency: SDL3 =====
+# Важно: мы выбираем компонент и таргет в зависимости от SDLWRAPPER_LINK_SDL3_STATIC
+if(SDLWRAPPER_LINK_SDL3_STATIC)
+  # как у тебя в Desktop-примере
+  find_package(SDL3 CONFIG REQUIRED COMPONENTS SDL3-static)
+  target_link_libraries(SDLWrapper PUBLIC SDL3::SDL3-static)
+else()
+  # типичный shared таргет
+  find_package(SDL3 CONFIG REQUIRED)
+  target_link_libraries(SDLWrapper PUBLIC SDL3::SDL3)
+endif()
+
+# Если твоей обёртке нужно SDL_MAIN_USE_CALLBACKS и т.п. — добавляй сюда.
+# target_compile_definitions(SDLWrapper PUBLIC SDL_MAIN_USE_CALLBACKS)
+
+# ===== Install: library + headers =====
+install(TARGETS SDLWrapper
+  EXPORT SDLWrapperTargets
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(DIRECTORY include/
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+# ===== Install: export targets =====
+install(EXPORT SDLWrapperTargets
+  FILE SDLWrapperTargets.cmake
+  NAMESPACE SDLWrapper::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SDLWrapper
+)
+
+# ===== Install: Config + Version =====
+configure_package_config_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/SDLWrapperConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/SDLWrapperConfig.cmake
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SDLWrapper
+)
+
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/SDLWrapperConfigVersion.cmake
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion
+)
+
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/SDLWrapperConfig.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/SDLWrapperConfigVersion.cmake
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SDLWrapper
+)
+
+
+
+
+
+# cmake_minimum_required(VERSION 3.22.1)
+
+# set(CMAKE_CXX_STANDARD 23)
+# set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# project("Android-SDL3-Example" LANGUAGES CXX C)
+
+# set(EXECUTABLE_NAME ${PROJECT_NAME})
+# set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
+# set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
+# set(THIRD_PARTY_BUILD_DIR "${CMAKE_BINARY_DIR}/_3rdparty")
+
+# if(NOT DEFINED EXTERNAL_DIR)
+#     message(ERROR EXTERNAL_DIR is not defined)
+# endif()
+
+# set(SOURCE_CPP
+#     ${SRC_DIR}/main.cpp
+    
+#     ${SRC_DIR}/CircleShape.cpp
+#     ${SRC_DIR}/Convert.cpp
+#     ${SRC_DIR}/EllipseShape.cpp
+#     ${SRC_DIR}/Log.cpp
+#     ${SRC_DIR}/Matrix3x3.cpp
+#     ${SRC_DIR}/Operators.cpp
+#     ${SRC_DIR}/RectangleShape.cpp
+#     ${SRC_DIR}/RenderMeneger.cpp
+#     ${SRC_DIR}/RenderTarget.cpp
+#     ${SRC_DIR}/RenderWindow.cpp
+#     ${SRC_DIR}/Shape.cpp
+#     ${SRC_DIR}/Sprite.cpp
+#     ${SRC_DIR}/Texture.cpp
+#     ${SRC_DIR}/Transformable.cpp
+#     ${SRC_DIR}/VectorMath.cpp
+#     ${SRC_DIR}/VideoMode.cpp
+#     ${SRC_DIR}/View.cpp
+# )
+# set(INCLUDE_PATHS
+#     ${INCLUDE_DIR}
+# )
+
+# if(ANDROID)
+#     include(cmake/AppAndroid.cmake)
+# elseif(WIN32)
+#     include(cmake/AppWindows.cmake)
+# endif()
