@@ -2,7 +2,7 @@
 #include <SDLWrapper/Renders/VideoMode.hpp>
 
 #include <SDL3/SDL_init.h>
-#include <SDLWrapper/Log.hpp>
+#include <SDL3/SDL_Log.h>
 
 namespace sdl3
 {
@@ -28,7 +28,7 @@ void initDefaultSize(VideoMode &settings)
 {
     if (!SDL_InitSubSystem(SDL_INIT_VIDEO))
     {
-        log::Error("{}", std::source_location::current(), SDL_GetError());
+        SDL_Log("%s", SDL_GetError());
         return;
     }
     SDL_DisplayID displayID = SDL_GetPrimaryDisplay();
@@ -36,7 +36,7 @@ void initDefaultSize(VideoMode &settings)
     if (!mode)
     {
         SDL_QuitSubSystem(SDL_INIT_VIDEO);
-        log::Error("{}", std::source_location::current(), SDL_GetError());
+        SDL_Log("%s", SDL_GetError());
         return;
     }
 

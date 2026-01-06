@@ -6,7 +6,6 @@
 #include <SDL3/SDL_video.h>
 #include <SDL3_image/SDL_image.h>
 
-#include <SDLWrapper/Log.hpp>
 #include <SDLWrapper/Renders/RenderMeneger.hpp>
 
 struct Deleterer
@@ -42,7 +41,7 @@ bool RenderWindow::create(const std::string_view name, const VideoMode &mode)
     bool res = SDL_CreateWindowAndRenderer(name.data(), mode.width, mode.height, VideoMode::makeWindowFlags(mode), &wnd, &rnd);
     if (!res)
     {
-        log::Error("{}", std::source_location::current(), SDL_GetError());
+        SDL_Log("%s", SDL_GetError());
         return false;
     }
 
@@ -96,7 +95,7 @@ bool RenderWindow::loadIconFromFile(const std::string_view iconFileName)
 
     if (!icon)
     {
-        log::Error("{}", std::source_location::current(), SDL_GetError());
+        SDL_Log("%s", SDL_GetError());
         return false;
     }
     bool res = SDL_SetWindowIcon(window_.get(), icon);

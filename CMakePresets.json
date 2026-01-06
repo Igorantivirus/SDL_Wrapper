@@ -10,111 +10,83 @@
       "name": "base-win",
       "hidden": true,
       "generator": "Ninja Multi-Config",
-      "binaryDir": "build/msvc-x64",
+      "binaryDir": "build/win",
       "environment": {
         "PATH": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.41.34120/bin/Hostx64/x64;C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x64;$penv{PATH}",
         "INCLUDE": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.41.34120/include;C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/ucrt;C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/um;C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/shared;C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/winrt;C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/cppwinrt;$penv{INCLUDE}",
         "LIB": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.41.34120/lib/x64;C:/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0/ucrt/x64;C:/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0/um/x64;$penv{LIB}"
       },
       "cacheVariables": {
-        "CMAKE_CXX_STANDARD": "20"
+        "CMAKE_CXX_STANDARD": "20",
+        "SDL3_INC_DIR": "D:/dev/libraries/_install/sdl3/include",
+        "SDL3_IMAGE_INC_DIR": "D:/dev/libraries/_install/sdl3/include"
       }
     },
     {
       "name": "base-android",
       "hidden": true,
-      "generator": "Ninja",
+      "generator": "Ninja Multi-Config",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "C:/Users/igora/AppData/Local/Android/Sdk/ndk/26.1.10909125/build/cmake/android.toolchain.cmake",
+        "CMAKE_CXX_STANDARD": "20",
+        "CMAKE_CONFIGURATION_TYPES": "Debug;Release",
         "ANDROID_PLATFORM": "android-24",
-        "CMAKE_CXX_STANDARD": "20"
+        "CMAKE_TOOLCHAIN_FILE": "C:/Users/igora/AppData/Local/Android/Sdk/ndk/26.1.10909125/build/cmake/android.toolchain.cmake",
+        "ANDROID_NDK": "C:/Users/igora/AppData/Local/Android/Sdk/ndk/26.1.10909125",
+        "SDL3_INC_DIR": "D:/dev/libraries/_install/sdl3/include",
+        "SDL3_IMAGE_INC_DIR": "D:/dev/libraries/_install/sdl3/include"
       }
     },
     {
-      "name": "win-static",
+      "name": "win-msvc-x64-mt",
       "inherits": "base-win",
-      "displayName": "MSVC x64 Static",
+      "displayName": "Windows MSVC x64 /MT",
+      "binaryDir": "build/win-msvc-x64-mt",
       "cacheVariables": {
         "BUILD_SHARED_LIBS": "OFF",
         "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>"
       }
     },
     {
-      "name": "win-shared",
+      "name": "win-msvc-x64-md",
       "inherits": "base-win",
-      "displayName": "MSVC x64 Shared",
+      "displayName": "Windows MSVC x64 /MD",
+      "binaryDir": "build/win-msvc-x64-md",
       "cacheVariables": {
-        "BUILD_SHARED_LIBS": "ON",
+        "BUILD_SHARED_LIBS": "OFF",
         "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:DebugDLL>"
       }
     },
     {
-      "name": "android-arm64-static",
+      "name": "android-arm64",
       "inherits": "base-android",
-      "binaryDir": "build/android-arm64-static",
+      "binaryDir": "build/android-arm64",
       "cacheVariables": {
         "ANDROID_ABI": "arm64-v8a",
         "BUILD_SHARED_LIBS": "OFF"
       }
     },
     {
-      "name": "android-arm64-shared",
+      "name": "android-x86_64",
       "inherits": "base-android",
-      "binaryDir": "build/android-arm64-shared",
-      "cacheVariables": {
-        "ANDROID_ABI": "arm64-v8a",
-        "BUILD_SHARED_LIBS": "ON"
-      }
-    },
-    {
-      "name": "android-x86_64-static",
-      "inherits": "base-android",
-      "binaryDir": "build/android-x86_64-static",
+      "binaryDir": "build/android-x86_64",
       "cacheVariables": {
         "ANDROID_ABI": "x86_64",
         "BUILD_SHARED_LIBS": "OFF"
-      }
-    },
-    {
-      "name": "android-x86_64-shared",
-      "inherits": "base-android",
-      "binaryDir": "build/android-x86_64-shared",
-      "cacheVariables": {
-        "ANDROID_ABI": "x86_64",
-        "BUILD_SHARED_LIBS": "ON"
       }
     }
   ],
-  "buildPresets": [
-    {
-      "name": "win-static-debug",
-      "configurePreset": "win-static",
-      "configuration": "Debug"
-    },
-    {
-      "name": "win-static-release",
-      "configurePreset": "win-static",
-      "configuration": "Release"
-    },
-    {
-      "name": "win-shared-debug",
-      "configurePreset": "win-shared",
-      "configuration": "Debug"
-    },
-    {
-      "name": "win-shared-release",
-      "configurePreset": "win-shared",
-      "configuration": "Release"
-    },
-    {
-      "name": "android-arm64-static-release",
-      "configurePreset": "android-arm64-static",
-      "configuration": "Release"
-    },
-    {
-      "name": "android-arm64-shared-release",
-      "configurePreset": "android-arm64-shared",
-      "configuration": "Release"
-    }
+  "buildPresets":
+  [
+    { "name": "win-mt-debug",           "displayName":     "Windows MSVC x64 /MT — Debug",   "configurePreset": "win-msvc-x64-mt", "configuration": "Debug"},
+    { "name": "win-mt-release",         "displayName":     "Windows MSVC x64 /MT — Release", "configurePreset": "win-msvc-x64-mt", "configuration": "Release"},
+
+    { "name": "win-md-debug",           "displayName":     "Windows MSVC x64 /MD — Debug",   "configurePreset": "win-msvc-x64-md", "configuration": "Debug"},
+    { "name": "win-md-release",         "displayName":     "Windows MSVC x64 /MD — Release", "configurePreset": "win-msvc-x64-md", "configuration": "Release"},
+
+    { "name": "android-arm64-debug",    "configurePreset": "android-arm64",                  "configuration": "Debug" },
+    { "name": "android-arm64-release",  "configurePreset": "android-arm64",                  "configuration": "Release" },
+
+    { "name": "android-x86_64-debug",   "configurePreset": "android-x86_64",                 "configuration": "Debug" },
+    { "name": "android-x86_64-release", "configurePreset": "android-x86_64",                 "configuration": "Release" }
   ]
 }

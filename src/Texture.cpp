@@ -6,7 +6,6 @@
 #include <SDL3/SDL_render.h>
 #include <SDL3_image/SDL_image.h>
 
-#include <SDLWrapper/Log.hpp>
 #include <SDLWrapper/Renders/RenderMeneger.hpp>
 
 struct TextureDeleter
@@ -30,7 +29,7 @@ bool Texture::loadFromFile(const char *fileName)
     std::shared_ptr<SDL_Renderer> rendererS = RenderMeneger::getRenderer(windowID_).lock();
     if (!rendererS)
     {
-        log::Error("There is no renderer to open the texture", std::source_location::current());
+        SDL_Log("There is no renderer to open the texture");
         return false;
     }
     SDL_Renderer *renderer = rendererS.get();
@@ -38,7 +37,7 @@ bool Texture::loadFromFile(const char *fileName)
     SDL_Texture *texture = IMG_LoadTexture(renderer, fileName);
     if (!texture)
     {
-        log::Error("Failed to load texture from file: \"{}\" with SDL error: \"{}\"", std::source_location::current(), fileName, SDL_GetError());
+        SDL_Log("%s", SDL_GetError());
         return false;
     }
     texture_.reset(texture, TextureDeleter{});
