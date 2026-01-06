@@ -56,7 +56,7 @@ target_sources(SDLWrapper PRIVATE
 # 3. Зависимости (SDL3)
 # Мы используем QUIET, так как установка SDL лежит на конечном пользователе,
 # но нам нужны заголовки для компиляции самой обертки.
-find_package(SDL3 REQUIRED)
+find_package(SDL3 CONFIG REQUIRED COMPONENTS)
 find_package(SDL3_image REQUIRED)
 
 # Подключаем зависимости к нашей цели
