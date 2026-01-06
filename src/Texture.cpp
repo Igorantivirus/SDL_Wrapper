@@ -61,7 +61,7 @@ std::weak_ptr<SDL_Texture> Texture::getSDLTexture()
     return texture_;
 }
 
-const SDL_Point &Texture::getSize() const
+const Vector2i &Texture::getSize() const
 {
     return size_;
 }

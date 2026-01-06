@@ -3,8 +3,9 @@
 #include <cstddef>
 #include <memory>
 
-#include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
+
+#include <SDLWrapper/Names.hpp>
 
 namespace sdl3
 {
@@ -20,12 +21,12 @@ public:
     std::weak_ptr<const SDL_Texture> getSDLTexture() const;
     std::weak_ptr<SDL_Texture> getSDLTexture();
 
-    const SDL_Point &getSize() const;
+    const Vector2i &getSize() const;
 
 private:
 
     std::shared_ptr<SDL_Texture> texture_ = nullptr;
-    SDL_Point size_ = {};
+    Vector2i size_ = {};
 
     std::size_t windowID_ = std::size_t(-1);
 

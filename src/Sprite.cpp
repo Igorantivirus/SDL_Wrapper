@@ -6,12 +6,12 @@
 namespace sdl3
 {
 
-void Sprite::setFilterColor(const SDL_FColor &color)
+void Sprite::setFilterColor(const Color &color)
 {
     color_ = color;
 }
 
-const SDL_FColor &Sprite::getFilterColor() const
+const Color &Sprite::getFilterColor() const
 {
     return color_;
 }
@@ -21,20 +21,20 @@ void Sprite::setTexture(const Texture &texture)
     texture_ = &texture;
     textureRect_.x = 0;
     textureRect_.y = 0;
-    SDL_Point size = texture.getSize();
+    Vector2i size = texture.getSize();
     textureRect_.w = static_cast<float>(size.x);
     textureRect_.h = static_cast<float>(size.y);
     updateLocalGeometry();
 }
 
-void Sprite::setTexture(const Texture &texture, const SDL_FRect &textureRect)
+void Sprite::setTexture(const Texture &texture, const FloatRect &textureRect)
 {
     texture_ = &texture;
     textureRect_ = textureRect;
     updateLocalGeometry();
 }
 
-void Sprite::setTextureRect(const SDL_FRect &textureRect)
+void Sprite::setTextureRect(const FloatRect &textureRect)
 {
     textureRect_ = textureRect;
     updateLocalGeometry();
@@ -45,28 +45,28 @@ const Texture *Sprite::getTexture() const
     return texture_;
 }
 
-const SDL_FRect &Sprite::getTextureRect() const
+const FloatRect &Sprite::getTextureRect() const
 {
     return textureRect_;
 }
 
-void Sprite::setCenterPosition(const SDL_FPoint &position)
+void Sprite::setCenterPosition(const Vector2f &position)
 {
     if (!texture_)
         return;
-    SDL_FPoint pos = position;
-    SDL_Point size = texture_->getSize();
+    Vector2f pos = position;
+    Vector2i size = texture_->getSize();
     pos.x -= size.x / 2.f;
     pos.y -= size.y / 2.f;
     Transformable::setPosition(pos);
 }
 
-SDL_FPoint Sprite::getCenterPosition() const
+Vector2f Sprite::getCenterPosition() const
 {
     if (!texture_)
         return getPosition();
-    SDL_FPoint pos = getPosition();
-    SDL_Point size = texture_->getSize();
+    Vector2f pos = getPosition();
+    Vector2i size = texture_->getSize();
     pos.x += size.x / 2.f;
     pos.y += size.y / 2.f;
     return pos;
@@ -79,8 +79,8 @@ void Sprite::draw(RenderTarget &target) const
 
     if (viewID_ != target.getViewId() || m_dirty || dirty_)
     {
-        Matrix3x3 matrix = target.getView().getTransformMatrix() * getTransformMatrix();
-        const SDL_FPoint screenCenter = target.getTargetCenter();
+        Matrix3x3<float> matrix = target.getView().getTransformMatrix() * getTransformMatrix();
+        const Vector2f screenCenter = target.getTargetCenter();
         matrix.tx += screenCenter.x;
         matrix.ty += screenCenter.y;
         updateVertices(matrix);
@@ -104,7 +104,7 @@ void Sprite::updateLocalGeometry()
         return;
     }
 
-    SDL_Point texSize = texture_->getSize();
+    Vector2i texSize = texture_->getSize();
     float tw = static_cast<float>(texSize.x);
     float th = static_cast<float>(texSize.y);
 
@@ -120,7 +120,7 @@ void Sprite::updateLocalGeometry()
     dirty_ = true;
 }
 
-void Sprite::updateVertices(const Matrix3x3 &matrix) const
+void Sprite::updateVertices(const Matrix3x3<float> &matrix) const
 {
     for (int i = 0; i < 4; ++i)
         vertices_[i] = matrix.transform(localVertices_[i]);

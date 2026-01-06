@@ -1,8 +1,9 @@
 #pragma once
 
 #include <SDL3/SDL_pixels.h>
-#include <SDL3/SDL_rect.h>
-
+#include <SDLWrapper/Rect.hpp>
+#include <SDLWrapper/Names.hpp>
+#include <SDLWrapper/Math/Colors.hpp>
 #include <SDLWrapper/ObjectBase/Drawable.hpp>
 #include <SDLWrapper/ObjectBase/Transformable.hpp>
 
@@ -17,29 +18,29 @@ class Sprite : public Drawable, public Transformable
 public:
     Sprite() = default;
 
-    void setFilterColor(const SDL_FColor &color);
-    const SDL_FColor &getFilterColor() const;
+    void setFilterColor(const Color &color);
+    const Color &getFilterColor() const;
 
     void setTexture(const Texture &texture);
-    void setTexture(const Texture &texture, const SDL_FRect &textureRect);
-    void setTextureRect(const SDL_FRect &textureRect);
+    void setTexture(const Texture &texture, const FloatRect &textureRect);
+    void setTextureRect(const FloatRect &textureRect);
 
     const Texture *getTexture() const;
-    const SDL_FRect &getTextureRect() const;
+    const FloatRect &getTextureRect() const;
 
-    void setCenterPosition(const SDL_FPoint &position);
-    SDL_FPoint getCenterPosition() const;
+    void setCenterPosition(const Vector2f &position);
+    Vector2f getCenterPosition() const;
 
 private:
     const Texture *texture_ = nullptr;
-    SDL_FRect textureRect_{};
+    FloatRect textureRect_{};
 
-    SDL_FColor color_ = {1.f, 1.f, 1.f, 1.f};
+    Color color_ = Colors::White;
 
-    SDL_FPoint localVertices_[4]{};
-    SDL_FPoint textureUV_[4]{};
+    Vector2f localVertices_[4]{};
+    Vector2f textureUV_[4]{};
 
-    mutable SDL_FPoint vertices_[4]{};
+    mutable Vector2f vertices_[4]{};
     mutable bool dirty_ = false;
 
     static constexpr int indices_[6] = {0, 1, 2, 2, 3, 0};
@@ -47,7 +48,7 @@ private:
 private:
     void draw(RenderTarget &target) const override;
     void updateLocalGeometry();
-    void updateVertices(const Matrix3x3 &matrix) const;
+    void updateVertices(const Matrix3x3<float> &matrix) const;
 };
 
 } // namespace sdl3

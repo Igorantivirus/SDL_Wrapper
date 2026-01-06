@@ -7,7 +7,7 @@
 namespace sdl3
 {
 
-void View::setCenterPosition(const SDL_FPoint &pos)
+void View::setCenterPosition(const Vector2f &pos)
 {
     if (center_.x == pos.x && center_.y == pos.y)
         return;
@@ -15,12 +15,12 @@ void View::setCenterPosition(const SDL_FPoint &pos)
     m_dirty = true;
 }
 
-const SDL_FPoint &View::getCenterPosition() const
+const Vector2f &View::getCenterPosition() const
 {
     return center_;
 }
 
-void View::setZoom(const SDL_FPoint &zoom)
+void View::setZoom(const Vector2f &zoom)
 {
     float zx = std::abs(zoom.x);
     float zy = std::abs(zoom.y);
@@ -41,7 +41,7 @@ void View::setUniformScale(const float zoom)
     m_dirty = true;
 }
 
-const SDL_FPoint &View::getZoom() const
+const Vector2f &View::getZoom() const
 {
     return zoom_;
 }
@@ -65,7 +65,7 @@ void View::rotate(const float angle)
     setAngle(angle_ + angle);
 }
 
-const Matrix3x3 &View::getTransformMatrix() const
+const Matrix3x3<float> &View::getTransformMatrix() const
 {
     if (m_dirty)
     {
