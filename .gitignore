@@ -5,3 +5,5 @@ build
 .clangd
 
 CMakePresets.json
+
+src/main.cpp
