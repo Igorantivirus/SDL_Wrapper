@@ -114,4 +114,11 @@ void RenderWindow::unsubscribe()
     windowID_ = std::size_t(-1);
 }
 
+Vector2i RenderWindow::getSize() const
+{
+    Vector2i size{};
+    SDL_GetWindowSize(window_.get(), &size.x, &size.y);
+    return size;
+}
+
 } // namespace sdl3

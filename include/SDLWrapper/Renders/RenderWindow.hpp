@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SDL3/SDL_video.h"
 #include <cstddef>
 #include <memory>
 #include <string_view>
@@ -29,6 +30,8 @@ public:
     void setFullScreen(bool isFull);
 
     bool loadIconFromFile(std::string_view iconFileName);
+
+    Vector2i getSize() const;
 
 private:
     
