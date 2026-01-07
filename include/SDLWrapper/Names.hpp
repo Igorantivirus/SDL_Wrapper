@@ -1,14 +1,9 @@
 #pragma once
 
-#include <concepts>
-
 namespace sdl3
 {
 
 template <typename T>
-concept arithmetic = std::integral<T> || std::floating_point<T>;
-
-template <arithmetic T>
 struct Vector2
 {
     T x{};
@@ -93,7 +88,7 @@ struct Vector2
 };
 
 // Дружественные операторы для скаляра слева
-template <arithmetic T>
+template <typename T>
 Vector2<T> operator*(T scalar, const Vector2<T> &vec)
 {
     return {scalar * vec.x, scalar * vec.y};
@@ -101,7 +96,7 @@ Vector2<T> operator*(T scalar, const Vector2<T> &vec)
 
 // ==================== Vector3 ====================
 
-template <arithmetic T>
+template <typename T>
 struct Vector3
 {
     T x{};
@@ -190,7 +185,7 @@ struct Vector3
     }
 };
 
-template <arithmetic T>
+template <typename T>
 Vector3<T> operator*(T scalar, const Vector3<T> &vec)
 {
     return {scalar * vec.x, scalar * vec.y, scalar * vec.z};

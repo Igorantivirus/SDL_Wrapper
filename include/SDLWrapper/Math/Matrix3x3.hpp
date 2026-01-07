@@ -11,7 +11,7 @@ namespace sdl3
 [ 0  0  1  ]
 */
 
-template <arithmetic T>
+template <typename T>
 struct Matrix3x3
 {
     T a, b, c, d, tx, ty;
