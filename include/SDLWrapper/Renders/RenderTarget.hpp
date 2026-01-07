@@ -4,14 +4,14 @@
 
 #include <SDL3/SDL_render.h>
 
-#include <SDLWrapper/Names.hpp>
-#include <SDLWrapper/Texture.hpp>
 #include <SDLWrapper/Math/Colors.hpp>
+#include <SDLWrapper/Names.hpp>
 #include <SDLWrapper/Renders/View.hpp>
+#include <SDLWrapper/Texture.hpp>
+
 
 namespace sdl3
 {
-
 
 class Drawable;
 class Texture;
@@ -22,6 +22,7 @@ public:
     virtual ~RenderTarget() = default;
 
     void draw(const Drawable &object);
+    void draw(const Drawable *object);
 
     void drawShape(const Texture *texture,
                    const Vector2f *positions, int posCnt,
@@ -49,4 +50,3 @@ protected:
 };
 
 } // namespace sdl3
-

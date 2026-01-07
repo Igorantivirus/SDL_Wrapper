@@ -20,6 +20,10 @@ void RenderTarget::draw(const Drawable &object)
 {
     object.draw(*this);
 }
+void RenderTarget::draw(const Drawable* object)
+{
+    object->draw(*this);
+}
 
 void RenderTarget::drawShape(const Texture *texture,
                              const Vector2f *positions, const int posCnt,
