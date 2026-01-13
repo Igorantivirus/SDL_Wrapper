@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SDL3/SDL_video.h"
 #include <cstddef>
 #include <memory>
 #include <string_view>
@@ -30,9 +31,11 @@ public:
     void setFullScreen(bool isFull);
 
     bool loadIconFromFile(std::string_view iconFileName);
-    bool setPhysicalWindowSize(const Vector2i& size);
+    bool setRenderLogicalPresentation(const Vector2i& size);
 
     Vector2i getSize() const;
+
+    std::shared_ptr<SDL_Window> getNativeSDLWindow();
 
 private:
     

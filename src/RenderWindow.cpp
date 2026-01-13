@@ -103,7 +103,7 @@ bool RenderWindow::loadIconFromFile(const std::string_view iconFileName)
     return res;
 }
 
-bool RenderWindow::setPhysicalWindowSize(const Vector2i &size)
+bool RenderWindow::setRenderLogicalPresentation(const Vector2i &size)
 {
     bool res = SDL_SetRenderLogicalPresentation(renderer_.get(), size.x, size.y, SDL_LOGICAL_PRESENTATION_LETTERBOX);
     if(!res)
@@ -127,6 +127,11 @@ Vector2i RenderWindow::getSize() const
     Vector2i size{};
     SDL_GetWindowSize(window_.get(), &size.x, &size.y);
     return size;
+}
+
+std::shared_ptr<SDL_Window> RenderWindow::getNativeSDLWindow()
+{
+    return window_;
 }
 
 } // namespace sdl3

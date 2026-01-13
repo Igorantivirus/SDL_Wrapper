@@ -82,4 +82,9 @@ void RenderTarget::setBaseViewPosition(const Vector2f &pos)
     view_.setCenterPosition(pos);
 }
 
+std::shared_ptr<SDL_Renderer> RenderTarget::getNativeSDLRenderer()
+{
+    return renderer_;
+}
+
 } // namespace sdl3

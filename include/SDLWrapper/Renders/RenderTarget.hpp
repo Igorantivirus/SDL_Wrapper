@@ -38,6 +38,8 @@ public:
     void clear(const Color &color = Colors::Black);
     void display();
 
+    std::shared_ptr<SDL_Renderer> getNativeSDLRenderer();
+
 protected:
     std::shared_ptr<SDL_Renderer> renderer_;
     View view_;
