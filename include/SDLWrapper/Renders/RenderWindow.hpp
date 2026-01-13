@@ -1,12 +1,12 @@
 #pragma once
 
-#include "SDLWrapper/Names.hpp"
 #include <cstddef>
 #include <memory>
 #include <string_view>
 
 #include <SDL3/SDL_render.h>
 
+#include <SDLWrapper/Names.hpp>
 #include <SDLWrapper/Renders/RenderTarget.hpp>
 #include <SDLWrapper/Renders/VideoMode.hpp>
 
