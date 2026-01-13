@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDLWrapper/Names.hpp>
+#include <SDLWrapper/Clock.hpp>
 #include <SDLWrapper/Rect.hpp>
 #include <SDLWrapper/Texture.hpp>
 
