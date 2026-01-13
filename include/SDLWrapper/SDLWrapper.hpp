@@ -1,5 +1,8 @@
 #pragma once
 
+#include <SDL3/SDL_init.h>
+#include <SDL3/SDL_events.h>
+
 #include <SDLWrapper/Names.hpp>
 #include <SDLWrapper/Clock.hpp>
 #include <SDLWrapper/Rect.hpp>
