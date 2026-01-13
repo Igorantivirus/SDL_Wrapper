@@ -103,6 +103,14 @@ bool RenderWindow::loadIconFromFile(const std::string_view iconFileName)
     return res;
 }
 
+bool RenderWindow::setPhysicalWindowSize(const Vector2i &size)
+{
+    bool res = SDL_SetRenderLogicalPresentation(renderer_.get(), size.x, size.y, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    if(!res)
+        SDL_Log("%s", SDL_GetError());
+    return res;
+}
+
 void RenderWindow::subscribe()
 {
     windowID_ = RenderMeneger::subscribeRenderer(renderer_);

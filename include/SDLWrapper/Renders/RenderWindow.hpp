@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SDLWrapper/Names.hpp"
 #include <cstddef>
 #include <memory>
 #include <string_view>
@@ -29,6 +30,7 @@ public:
     void setFullScreen(bool isFull);
 
     bool loadIconFromFile(std::string_view iconFileName);
+    bool setPhysicalWindowSize(const Vector2i& size);
 
     Vector2i getSize() const;
 
