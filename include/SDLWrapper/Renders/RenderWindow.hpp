@@ -31,7 +31,9 @@ public:
     void setFullScreen(bool isFull);
 
     bool loadIconFromFile(std::string_view iconFileName);
-    bool setRenderLogicalPresentation(const Vector2i& size);
+    bool setLogicalPresentation(const Vector2i& size);
+
+    float getDisplayScale() const;
 
     Vector2i getSize() const;
 
