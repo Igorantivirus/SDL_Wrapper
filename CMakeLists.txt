@@ -30,6 +30,7 @@ target_sources(SDLWrapper PRIVATE
     src/Transformable.cpp
     src/VideoMode.cpp
     src/View.cpp
+    src/Clock.cpp
 )
 
 # Подключение заголовков (пути переданы из пресетов)
