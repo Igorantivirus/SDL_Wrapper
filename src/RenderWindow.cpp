@@ -125,7 +125,7 @@ void RenderWindow::subscribe()
 void RenderWindow::unsubscribe()
 {
     RenderMeneger::unsubscribeRenderer(windowID_);
-    windowID_ = std::size_t(-1);
+    windowID_ = RenderMeneger::invalidID;
 }
 
 Vector2i RenderWindow::getSize() const

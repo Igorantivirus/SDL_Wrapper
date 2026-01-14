@@ -22,6 +22,8 @@ private:
     static void unsubscribeRenderer(std::size_t id);
     static std::weak_ptr<SDL_Renderer> getRenderer(std::size_t id);
 
+    inline static constexpr const std::size_t invalidID = std::size_t(-1);
+
 private:
     static std::unordered_map<std::size_t, std::weak_ptr<SDL_Renderer>> renders_;
 };

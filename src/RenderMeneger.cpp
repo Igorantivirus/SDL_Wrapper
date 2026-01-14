@@ -14,6 +14,7 @@ std::size_t RenderMeneger::subscribeRenderer(std::shared_ptr<SDL_Renderer> rende
 
 void RenderMeneger::unsubscribeRenderer(const std::size_t id)
 {
+    if(id != invalidID)
     renders_.erase(id);
 }
 
