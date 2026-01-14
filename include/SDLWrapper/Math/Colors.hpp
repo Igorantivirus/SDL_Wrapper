@@ -14,6 +14,10 @@ struct Color
     static Color toColor(const std::uint32_t hex);
     static Color toColor(const std::uint8_t r, const std::uint8_t g, const std::uint8_t b, const std::uint8_t a = 255);
     static std::uint32_t toHex(const Color &color);
+
+    bool operator==(const Color& color) const;
+    bool operator!=(const Color& color) const;
+
 };
 } // namespace sdl3
 

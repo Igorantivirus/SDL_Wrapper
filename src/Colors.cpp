@@ -22,4 +22,17 @@ std::uint32_t Color::toHex(const Color &color)
            (std::uint32_t(color.b * 255.0f) << 8) |
            std::uint32_t(color.a * 255.0f);
 }
+
+bool Color::operator==(const Color &color) const
+{
+    return r == color.r &&
+           g == color.g &&
+           b == color.b &&
+           a == color.a;
+}
+bool Color::operator!=(const Color &color) const
+{
+    return !this->operator==(color);
+}
+
 } // namespace sdl3
