@@ -106,15 +106,14 @@ bool RenderWindow::loadIconFromFile(const std::string_view iconFileName)
 bool RenderWindow::setLogicalPresentation(const Vector2i &size)
 {
     bool res = SDL_SetRenderLogicalPresentation(renderer_.get(), size.x, size.y, SDL_LOGICAL_PRESENTATION_LETTERBOX);
-    if(!res)
+    if (!res)
         SDL_Log("%s", SDL_GetError());
     return res;
 }
 
 float RenderWindow::getDisplayScale() const
 {
-    SDL_Window* window = const_cast<SDL_Window*>(window_.get());
-    return SDL_GetWindowDisplayScale(window);
+    return SDL_GetWindowDisplayScale(const_cast<SDL_Window *>(window_.get()));
 }
 
 void RenderWindow::subscribe()
@@ -131,13 +130,20 @@ void RenderWindow::unsubscribe()
 Vector2i RenderWindow::getSize() const
 {
     Vector2i size{};
-    SDL_GetWindowSize(window_.get(), &size.x, &size.y);
+    if (!SDL_GetWindowSize(window_.get(), &size.x, &size.y))
+        SDL_Log("%s", SDL_GetError());
     return size;
 }
 
 std::shared_ptr<SDL_Window> RenderWindow::getNativeSDLWindow()
 {
     return window_;
+}
+
+void RenderWindow::convertEventToRenderCoordinates(SDL_Event *event) const
+{
+    if (!SDL_ConvertEventToRenderCoordinates(const_cast<SDL_Renderer *>(renderer_.get()), event))
+        SDL_Log("%s", SDL_GetError());
 }
 
 } // namespace sdl3
