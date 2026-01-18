@@ -35,12 +35,15 @@ public:
     bool setLogicalPresentation(const Vector2i& size);
 
     float getDisplayScale() const;
+    float getPixelDensity() const;
 
     Vector2i getSize() const;
+    Vector2i getLogicSize() const;
 
     std::shared_ptr<SDL_Window> getNativeSDLWindow();
 
     void convertEventToRenderCoordinates(SDL_Event* event) const;
+    void convertEventToViewCoordinates(SDL_Event* event) const;
 
 private:
     

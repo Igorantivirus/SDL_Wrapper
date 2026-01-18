@@ -50,8 +50,6 @@ bool RenderWindow::create(const std::string_view name, const VideoMode &mode)
 
     subscribe();
     isFullScreen_ = mode.fullscreen;
-    targetSize_.x = mode.width;
-    targetSize_.y = mode.height;
     view_.setCenterPosition({mode.width / 2.f, mode.height / 2.f});
     isOpen_ = window_ && renderer_;
     return isOpen_;
@@ -116,6 +114,14 @@ float RenderWindow::getDisplayScale() const
     return SDL_GetWindowDisplayScale(const_cast<SDL_Window *>(window_.get()));
 }
 
+float RenderWindow::getPixelDensity() const
+{
+    const float density = SDL_GetWindowPixelDensity(window_.get());
+    if (density == 0.0f)
+        SDL_Log("%s", SDL_GetError());
+    return density;
+}
+
 void RenderWindow::subscribe()
 {
     windowID_ = RenderMeneger::subscribeRenderer(renderer_);
@@ -130,8 +136,23 @@ void RenderWindow::unsubscribe()
 Vector2i RenderWindow::getSize() const
 {
     Vector2i size{};
-    if (!SDL_GetWindowSize(window_.get(), &size.x, &size.y))
+    if (!SDL_GetRenderOutputSize(renderer_.get(), &size.x, &size.y))
         SDL_Log("%s", SDL_GetError());
+    return size;
+}
+
+Vector2i RenderWindow::getLogicSize() const
+{
+    Vector2i size{};
+    SDL_RendererLogicalPresentation mode = SDL_LOGICAL_PRESENTATION_DISABLED;
+    if (!SDL_GetRenderLogicalPresentation(renderer_.get(), &size.x, &size.y, &mode))
+    {
+        SDL_Log("%s", SDL_GetError());
+        return getSize();
+    }
+
+    if (mode == SDL_LOGICAL_PRESENTATION_DISABLED || size.x <= 0 || size.y <= 0)
+        return getSize();
     return size;
 }
 
@@ -144,6 +165,79 @@ void RenderWindow::convertEventToRenderCoordinates(SDL_Event *event) const
 {
     if (!SDL_ConvertEventToRenderCoordinates(const_cast<SDL_Renderer *>(renderer_.get()), event))
         SDL_Log("%s", SDL_GetError());
+}
+
+void RenderWindow::convertEventToViewCoordinates(SDL_Event *event) const
+{
+    if (!event)
+        return;
+
+    const Vector2f screenCenter = getTargetCenter();
+    // convertEventToRenderCoordinates(event);
+
+    Matrix3x3<float> worldToScreen = getView().getTransformMatrix();
+    worldToScreen.tx += screenCenter.x;
+    worldToScreen.ty += screenCenter.y;
+
+    Matrix3x3<float> screenToWorld;
+    if (!worldToScreen.tryInverse(screenToWorld))
+        return;
+
+    auto transformPointInPlace = [&](float &x, float &y)
+    {
+        const Vector2f out = screenToWorld.transform({x, y});
+        x = out.x;
+        y = out.y;
+    };
+
+    auto transformDeltaInPlace = [&](float &x, float &y)
+    {
+        const Vector2f out = screenToWorld.transformVector({x, y});
+        x = out.x;
+        y = out.y;
+    };
+
+    switch (event->type)
+    {
+    case SDL_EVENT_MOUSE_MOTION:
+        transformPointInPlace(event->motion.x, event->motion.y);
+        transformDeltaInPlace(event->motion.xrel, event->motion.yrel);
+        break;
+
+    case SDL_EVENT_MOUSE_BUTTON_DOWN:
+    case SDL_EVENT_MOUSE_BUTTON_UP:
+        transformPointInPlace(event->button.x, event->button.y);
+        break;
+
+    case SDL_EVENT_FINGER_DOWN:
+    case SDL_EVENT_FINGER_UP:
+    case SDL_EVENT_FINGER_MOTION:
+    case SDL_EVENT_FINGER_CANCELED:
+        transformPointInPlace(event->tfinger.x, event->tfinger.y);
+        transformDeltaInPlace(event->tfinger.dx, event->tfinger.dy);
+        break;
+
+    case SDL_EVENT_PEN_MOTION:
+        transformPointInPlace(event->pmotion.x, event->pmotion.y);
+        break;
+
+    case SDL_EVENT_PEN_DOWN:
+    case SDL_EVENT_PEN_UP:
+        transformPointInPlace(event->ptouch.x, event->ptouch.y);
+        break;
+
+    case SDL_EVENT_PEN_BUTTON_DOWN:
+    case SDL_EVENT_PEN_BUTTON_UP:
+        transformPointInPlace(event->pbutton.x, event->pbutton.y);
+        break;
+
+    case SDL_EVENT_PEN_AXIS:
+        transformPointInPlace(event->paxis.x, event->paxis.y);
+        break;
+
+    default:
+        break;
+    }
 }
 
 } // namespace sdl3

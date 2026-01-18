@@ -43,7 +43,6 @@ public:
 protected:
     std::shared_ptr<SDL_Renderer> renderer_;
     View view_;
-    Vector2i targetSize_{};
 
     unsigned viewId_ = 1;
 

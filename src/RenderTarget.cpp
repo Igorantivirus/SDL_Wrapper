@@ -1,6 +1,8 @@
 #include "SDL3/SDL_pixels.h"
 #include <SDLWrapper/Renders/RenderTarget.hpp>
 
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_log.h>
 #include <SDL3/SDL_render.h>
 
 #include <SDLWrapper/ObjectBase/Drawable.hpp>
@@ -63,7 +65,15 @@ unsigned RenderTarget::getViewId() const
 
 Vector2f RenderTarget::getTargetCenter() const
 {
-    return Vector2f{targetSize_.x / 2.0f, targetSize_.y / 2.0f};
+    if (!renderer_)
+        return Vector2f{0.0f, 0.0f};
+
+    int w = 0;
+    int h = 0;
+    if (!SDL_GetCurrentRenderOutputSize(renderer_.get(), &w, &h))
+        SDL_Log("%s", SDL_GetError());
+
+    return Vector2f{w / 2.0f, h / 2.0f};
 }
 
 void RenderTarget::clear(const Color &color)

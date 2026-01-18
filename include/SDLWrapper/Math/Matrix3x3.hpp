@@ -26,6 +26,13 @@ struct Matrix3x3
             a * p.x + c * p.y + tx,
             b * p.x + d * p.y + ty};
     }
+
+    Vector2<T> transformVector(const Vector2<T> &v) const
+    {
+        return {
+            a * v.x + c * v.y,
+            b * v.x + d * v.y};
+    }
     Vector3<T> transform(const Vector3<T> &p) const
     {
         return {
@@ -44,6 +51,25 @@ struct Matrix3x3
         result.tx = a * other.tx + c * other.ty + tx;
         result.ty = b * other.tx + d * other.ty + ty;
         return result;
+    }
+
+    bool tryInverse(Matrix3x3 &out) const
+    {
+        const T det = a * d - b * c;
+        if (det == static_cast<T>(0))
+            return false;
+
+        const T invDet = static_cast<T>(1) / det;
+
+        out.a = d * invDet;
+        out.b = -b * invDet;
+        out.c = -c * invDet;
+        out.d = a * invDet;
+
+        out.tx = -(out.a * tx + out.c * ty);
+        out.ty = -(out.b * tx + out.d * ty);
+
+        return true;
     }
 };
 
