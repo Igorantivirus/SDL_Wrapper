@@ -68,6 +68,18 @@ Vector2f RenderTarget::getTargetCenter() const
     if (!renderer_)
         return Vector2f{0.0f, 0.0f};
 
+    int logicalW = 0;
+    int logicalH = 0;
+    SDL_RendererLogicalPresentation logicalMode = SDL_LOGICAL_PRESENTATION_DISABLED;
+    if (SDL_GetRenderLogicalPresentation(renderer_.get(), &logicalW, &logicalH, &logicalMode) &&
+        logicalMode != SDL_LOGICAL_PRESENTATION_DISABLED &&
+        logicalW > 0 && logicalH > 0)
+    {
+        // При включённом logical presentation координатная система рендера становится "логической",
+        // поэтому центр должен быть в логических единицах, а не в пикселях реального output-size.
+        return Vector2f{logicalW / 2.0f, logicalH / 2.0f};
+    }
+
     int w = 0;
     int h = 0;
     if (!SDL_GetCurrentRenderOutputSize(renderer_.get(), &w, &h))
