@@ -18,6 +18,7 @@ public:
     void setRadius(float radius);
     void setPointCount(std::size_t pointCount);
 
+    const float getRadius() const;
     std::size_t getPointCount() const override;
     Vector2f getPoint(std::size_t index) const override;
 
