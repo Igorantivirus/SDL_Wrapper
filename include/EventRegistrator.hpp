@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_timer.h>
 
