@@ -32,7 +32,7 @@ public:
     void setFullScreen(bool isFull);
 
     bool loadIconFromFile(std::string_view iconFileName);
-    bool setLogicalPresentation(const Vector2i& size);
+    bool setLogicalPresentation(const Vector2i& size, const SDL_RendererLogicalPresentation mode);
 
     float getDisplayScale() const;
     float getPixelDensity() const;
