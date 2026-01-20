@@ -18,8 +18,11 @@ set_target_properties(SDLWrapper PROPERTIES
 # Все исходные файлы
 target_sources(SDLWrapper PRIVATE
     src/CircleShape.cpp
+    src/Clock.cpp
     src/Colors.cpp
     src/EllipseShape.cpp
+    src/FileWorker.cpp
+    src/PolygonShape.cpp
     src/RectangleShape.cpp
     src/RenderMeneger.cpp
     src/RenderTarget.cpp
@@ -30,7 +33,6 @@ target_sources(SDLWrapper PRIVATE
     src/Transformable.cpp
     src/VideoMode.cpp
     src/View.cpp
-    src/Clock.cpp
 )
 
 # Подключение заголовков (пути переданы из пресетов)
