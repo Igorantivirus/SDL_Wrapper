@@ -1,11 +1,13 @@
 #pragma once
 
-#include <SDL3/SDL_init.h>
 #include <SDL3/SDL_events.h>
+#include <SDL3/SDL_init.h>
 #include <SDL3/SDL_log.h>
 
-#include <SDLWrapper/Names.hpp>
 #include <SDLWrapper/Clock.hpp>
+#include <SDLWrapper/EventRegistrator.hpp>
+#include <SDLWrapper/FileWorker.hpp>
+#include <SDLWrapper/Names.hpp>
 #include <SDLWrapper/Rect.hpp>
 #include <SDLWrapper/Texture.hpp>
 
