@@ -25,6 +25,11 @@ void CircleShape::setPointCount(const std::size_t pointCount)
     updateLocalGeometry();
 }
 
+const float CircleShape::getRadius() const
+{
+    return radius_;
+}
+
 std::size_t CircleShape::getPointCount() const
 {
     return pointCount_;
