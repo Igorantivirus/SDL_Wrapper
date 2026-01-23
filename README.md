@@ -84,6 +84,12 @@ cmake -S . -B build/android-arm64 -G "Ninja Multi-Config"
   -DSDL3_IMAGE_INC_DIR="D:/path/to/SDL3_image/include"
 ```
 
+Repeat the Android configure/build/install for each ABI:
+`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64` (use separate build dirs like `build/android-<abi>`).
+
+On Windows you can also build+install all Android ABIs at once via `build_android_all.bat`
+(or the VS Code task `Install: Android (all ABIs)`).
+
 ### 3) Build
 
 ```powershell
