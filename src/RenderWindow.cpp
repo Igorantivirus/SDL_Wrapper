@@ -1,3 +1,4 @@
+#include "SDLWrapper/Renders/View.hpp"
 #include <SDLWrapper/Renders/RenderWindow.hpp>
 
 #include <SDL3/SDL_error.h>
@@ -101,31 +102,22 @@ bool RenderWindow::loadIconFromFile(const std::string_view iconFileName)
     return res;
 }
 
-bool RenderWindow::setLogicalPresentation(const Vector2i &size, const SDL_RendererLogicalPresentation mode)
+bool RenderWindow::setLogicalPresentation(const Vector2i &requestedSize, const SDL_RendererLogicalPresentation mode)
 {
-    // При смене logical presentation (особенно при смене ориентации, когда logical size "меняется местами")
-    // нужно сохранить текущий сдвиг камеры относительно центра экрана.
-    // Иначе центр `View` остаётся в старых логических координатах, а `getTargetCenter()` становится новым,
-    // что даёт визуальный сдвиг (вниз-влево и т.п.) и рассинхрон с физическим миром.
-    const Vector2i oldLogicalSize = getLogicSize();
-    const Vector2f oldLogicalCenter{oldLogicalSize.x / 2.0f, oldLogicalSize.y / 2.0f};
-    const Vector2f newLogicalCenter{size.x / 2.0f, size.y / 2.0f};
-    const Vector2f cameraOffset = getView().getCenterPosition() - oldLogicalCenter;
+    const Vector2i& oldSize = getLogicSize();
+    const Vector2i& newSize = requestedSize;
 
-    // SDL_LOGICAL_PRESENTATION_INTEGER_SCALE | SDL_LOGICAL_PRESENTATION_LETTERBOX
-    // SDL_RendererLogicalPresentation aboba = static_cast<SDL_RendererLogicalPresentation>(SDL_LOGICAL_PRESENTATION_INTEGER_SCALE | SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    const Vector2f& oldCenter = view_.getCenterPosition();
+    const Vector2f relativeCenter = {oldCenter.x / oldSize.x, oldCenter.y / oldSize.y};
+    const Vector2f newCenter = {relativeCenter.x * newSize.x, relativeCenter.y * newSize.y};
 
-    bool res = SDL_SetRenderLogicalPresentation(renderer_.get(), size.x, size.y, mode);
-    if (!res)
-        SDL_Log("%s", SDL_GetError());
-
-    if (res && (oldLogicalSize.x != size.x || oldLogicalSize.y != size.y))
+    if (!SDL_SetRenderLogicalPresentation(renderer_.get(), requestedSize.x, requestedSize.y, mode))
     {
-        View v = getView();
-        v.setCenterPosition(newLogicalCenter + cameraOffset);
-        setView(v); // важно инкрементировать viewId_
+        SDL_Log("SDL_SetRenderLogicalPresentation failed: %s", SDL_GetError());
+        return false;
     }
-    return res;
+    view_.setCenterPosition(newCenter);
+    return true;
 }
 
 float RenderWindow::getDisplayScale() const
