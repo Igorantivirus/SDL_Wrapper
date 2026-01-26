@@ -37,11 +37,12 @@ target_sources(SDLWrapper PRIVATE
 
 # Подключение заголовков (пути переданы из пресетов)
 target_include_directories(SDLWrapper 
-    PUBLIC 
+    PRIVATE 
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
         "${SDL3_INC_DIR}"
         "${SDL3_IMAGE_INC_DIR}"
+        "${SDL3_MIXER_INC_DIR}"
 )
 
 # --- Инсталляция ---
