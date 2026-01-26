@@ -24,7 +24,6 @@ target_sources(SDLWrapper PRIVATE
     src/FileWorker.cpp
     src/PolygonShape.cpp
     src/RectangleShape.cpp
-    src/RenderMeneger.cpp
     src/RenderTarget.cpp
     src/RenderWindow.cpp
     src/Shape.cpp
@@ -33,6 +32,8 @@ target_sources(SDLWrapper PRIVATE
     src/Transformable.cpp
     src/VideoMode.cpp
     src/View.cpp
+    src/Audio.cpp
+    src/AudioDevice.cpp
 )
 
 # Подключение заголовков (пути переданы из пресетов)
