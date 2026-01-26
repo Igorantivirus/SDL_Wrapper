@@ -8,8 +8,11 @@
 namespace sdl3::audio
 {
 
+class AudioDevice;
+
 class Audio
 {
+    friend class AudioDevice;
 public:
     explicit Audio(std::size_t deviceID = 0);
     Audio(const Audio &other) = delete;
@@ -30,9 +33,20 @@ public:
 
 private:
     std::shared_ptr<MIX_Audio> audio_ = nullptr;
-    bool isRunning_ = false;
+    mutable bool isRunning_ = false;
 
     std::size_t deviceID_ = std::size_t(-1);
+private:
+
+    void startAudio() const
+    {
+        isRunning_ = true;
+    }
+    void stopAudio() const
+    {
+        isRunning_ = true;
+    }
+
 };
 
 } // namespace audio

@@ -22,9 +22,9 @@ private:
 public:
     AudioDevice() = default;
 
-    void initTracks(const std::size_t tracksCount);
+    bool initTracks(const std::size_t tracksCount);
 
-    bool playSouns(const Audio &audio, bool replay = false);
+    bool playSound(const Audio &audio, bool replay = false);
 
     std::size_t update();
 

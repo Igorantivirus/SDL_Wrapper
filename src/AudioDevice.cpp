@@ -23,15 +23,16 @@ const std::size_t AudioDevice::getDeviceID() const
     return deviceID_;
 }
 
-void AudioDevice::initTracks(const std::size_t tracksCount)
+bool AudioDevice::initTracks(const std::size_t tracksCount)
 {
     MIX_Mixer *rawMixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
     if (!rawMixer)
     {
         SDL_Log("%s\n", SDL_GetError());
-        return;
+        return false;
     }
     mixer_.reset(rawMixer, MIX_DestroyMixer);
+    subscribe();
 
     freeTracks_.clear();
     usedTracks_.clear();
@@ -41,9 +42,10 @@ void AudioDevice::initTracks(const std::size_t tracksCount)
         std::shared_ptr<MIX_Track> track(MIX_CreateTrack(mixer_.get()), MIX_DestroyTrack);
         freeTracks_.push_back(std::move(track));
     }
+    return true;
 }
 
-bool AudioDevice::playSouns(const Audio &audio, bool replay)
+bool AudioDevice::playSound(const Audio &audio, bool replay)
 {
     if (freeTracks_.empty() || !audio)
         return false;
@@ -54,6 +56,7 @@ bool AudioDevice::playSouns(const Audio &audio, bool replay)
     AudioPair pair;
     pair.track = track;
     pair.audio = &audio;
+    pair.audio->startAudio();
 
     freeTracks_.pop_back();
     usedTracks_.push_back(std::move(pair));
@@ -72,6 +75,7 @@ std::size_t AudioDevice::update()
         // Если не проигрывается или был отключен
         if (!MIX_TrackPlaying(it->track.get()) || !it->audio->isRunnig())
         {
+            it->audio->stopAudio();
             MIX_SetTrackAudio(it->track.get(), nullptr); // Отсоединяем звук
 
             freeTracks_.push_back(it->track); // Возвращаем в пул свободных
