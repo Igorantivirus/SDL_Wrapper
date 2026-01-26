@@ -1,5 +1,5 @@
-#include "SDLWrapper/Renders/View.hpp"
 #include <SDLWrapper/Renders/RenderWindow.hpp>
+#include <SDLWrapper/Renders/View.hpp>
 
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_log.h>
@@ -104,10 +104,10 @@ bool RenderWindow::loadIconFromFile(const std::string_view iconFileName)
 
 bool RenderWindow::setLogicalPresentation(const Vector2i &requestedSize, const SDL_RendererLogicalPresentation mode)
 {
-    const Vector2i& oldSize = getLogicSize();
-    const Vector2i& newSize = requestedSize;
+    const Vector2i &oldSize = getLogicSize();
+    const Vector2i &newSize = requestedSize;
 
-    const Vector2f& oldCenter = view_.getCenterPosition();
+    const Vector2f &oldCenter = view_.getCenterPosition();
     const Vector2f relativeCenter = {oldCenter.x / oldSize.x, oldCenter.y / oldSize.y};
     const Vector2f newCenter = {relativeCenter.x * newSize.x, relativeCenter.y * newSize.y};
 

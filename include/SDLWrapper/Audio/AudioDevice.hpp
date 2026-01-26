@@ -21,6 +21,10 @@ private:
 
 public:
     AudioDevice() = default;
+    AudioDevice(const std::size_t tracksCount);
+    ~AudioDevice();
+
+    void close();
 
     bool initTracks(const std::size_t tracksCount);
 

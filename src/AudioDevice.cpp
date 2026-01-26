@@ -23,8 +23,26 @@ const std::size_t AudioDevice::getDeviceID() const
     return deviceID_;
 }
 
+AudioDevice::AudioDevice(const std::size_t tracksCount)
+{
+    void(initTracks(tracksCount));
+}
+AudioDevice::~AudioDevice()
+{
+    close();
+}
+
+void AudioDevice::close()
+{
+    mixer_.reset();
+    freeTracks_.clear();
+    usedTracks_.clear();
+    unsubscribe();
+}
+
 bool AudioDevice::initTracks(const std::size_t tracksCount)
 {
+    close();
     MIX_Mixer *rawMixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
     if (!rawMixer)
     {
@@ -34,8 +52,6 @@ bool AudioDevice::initTracks(const std::size_t tracksCount)
     mixer_.reset(rawMixer, MIX_DestroyMixer);
     subscribe();
 
-    freeTracks_.clear();
-    usedTracks_.clear();
     freeTracks_.reserve(tracksCount);
     while (freeTracks_.size() < tracksCount)
     {
