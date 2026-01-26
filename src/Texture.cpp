@@ -1,3 +1,4 @@
+#include "GlobalMeneger.hpp"
 #include <SDL3/SDL_error.h>
 #include <SDLWrapper/Texture.hpp>
 
@@ -6,7 +7,7 @@
 #include <SDL3/SDL_render.h>
 #include <SDL3_image/SDL_image.h>
 
-#include <SDLWrapper/Renders/RenderMeneger.hpp>
+#include "GlobalMeneger.hpp"
 
 struct TextureDeleter
 {
@@ -26,7 +27,7 @@ Texture::Texture(const std::size_t windowID) : windowID_(windowID)
 bool Texture::loadFromFile(const char *fileName)
 {
     clear();
-    std::shared_ptr<SDL_Renderer> rendererS = RenderMeneger::getRenderer(windowID_).lock();
+    std::shared_ptr<SDL_Renderer> rendererS = GlobalMeneger::getRenderer(windowID_).lock();
     if (!rendererS)
     {
         SDL_Log("There is no renderer to open the texture");
