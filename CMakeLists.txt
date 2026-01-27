@@ -17,6 +17,7 @@ set_target_properties(SDLWrapper PROPERTIES
 
 # Все исходные файлы
 target_sources(SDLWrapper PRIVATE
+    src/SDL3GlobalMeneger.cpp
     src/CircleShape.cpp
     src/Clock.cpp
     src/Colors.cpp

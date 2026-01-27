@@ -1,13 +1,12 @@
 #include <SDLWrapper/Renders/RenderWindow.hpp>
 #include <SDLWrapper/Renders/View.hpp>
+#include <SDLWrapper/SDL3GlobalMeneger.hpp>
 
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_log.h>
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_video.h>
 #include <SDL3_image/SDL_image.h>
-
-#include "GlobalMeneger.hpp"
 
 struct Deleterer
 {
@@ -58,10 +57,10 @@ bool RenderWindow::create(const std::string_view name, const VideoMode &mode)
 
 void RenderWindow::close()
 {
-    window_.reset();
-    renderer_.reset();
-    view_.reset();
     unsubscribe();
+    view_.reset();
+    renderer_.reset();
+    window_.reset();
     isOpen_ = isFullScreen_ = false;
 }
 
@@ -135,13 +134,13 @@ float RenderWindow::getPixelDensity() const
 
 void RenderWindow::subscribe()
 {
-    windowID_ = GlobalMeneger::subscribeRenderer(renderer_);
+    windowID_ = SDL3GlobalMeneger::subscribeRenderer(renderer_);
 }
 
 void RenderWindow::unsubscribe()
 {
-    GlobalMeneger::unsubscribeRenderer(windowID_);
-    windowID_ = GlobalMeneger::invalidID;
+    SDL3GlobalMeneger::unsubscribeRenderer(windowID_);
+    windowID_ = SDL3GlobalMeneger::invalidID;
 }
 
 Vector2i RenderWindow::getSize() const

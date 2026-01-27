@@ -1,21 +1,49 @@
 #include <SDLWrapper/Audio/AudioDevice.hpp>
 
+#include <SDLWrapper/SDL3GlobalMeneger.hpp>
+
 #include <SDL3/SDL_error.h>
 
-#include "GlobalMeneger.hpp"
+// loops: 0 = no loop, 1 = loop once, -1 = infinite
+static SDL_PropertiesID makePlayOptions(int loops)
+{
+    if (loops == 0)
+    {
+        return 0; // "defaults for everything" :contentReference[oaicite:1]{index=1}
+    }
+
+    SDL_PropertiesID props = SDL_CreateProperties();
+    if (props == 0)
+    {
+        // SDL_GetError() если хочешь залогировать
+        return 0;
+    }
+
+    // MIX_PROP_PLAY_LOOPS_NUMBER: -1 infinite, 0 none, 1+ finite :contentReference[oaicite:2]{index=2}
+    SDL_SetNumberProperty(props, MIX_PROP_PLAY_LOOPS_NUMBER, loops);
+    return props;
+}
+
+static void destroyPlayOptions(SDL_PropertiesID props)
+{
+    if (props != 0)
+    {
+        SDL_DestroyProperties(props);
+    }
+}
 
 namespace sdl3::audio
 {
 
 void AudioDevice::subscribe()
 {
-    deviceID_ = GlobalMeneger::subscribeMixer(mixer_);
+    deviceID_ = SDL3GlobalMeneger::subscribeMixer(mixer_);
 }
 
 void AudioDevice::unsubscribe()
 {
-    GlobalMeneger::unsubscribeMixer(deviceID_);
-    deviceID_ = GlobalMeneger::invalidID;
+    SDL3GlobalMeneger::unsubscribeMixer(deviceID_);
+    deviceID_ = SDL3GlobalMeneger::invalidID;
 }
 
 const std::size_t AudioDevice::getDeviceID() const
@@ -34,10 +62,12 @@ AudioDevice::~AudioDevice()
 
 void AudioDevice::close()
 {
-    mixer_.reset();
-    freeTracks_.clear();
-    usedTracks_.clear();
     unsubscribe();
+
+    usedTracks_.clear();
+    freeTracks_.clear();
+
+    mixer_.reset();
 }
 
 bool AudioDevice::initTracks(const std::size_t tracksCount)
@@ -79,7 +109,10 @@ bool AudioDevice::playSound(const Audio &audio, bool replay)
 
     MIX_SetTrackAudio(track.get(), const_cast<MIX_Audio *>(audioS.get()));
     MIX_SetTrackGain(track.get(), 1.0f);
-    MIX_PlayTrack(track.get(), replay ? -1 : 0);
+
+    SDL_PropertiesID opts = makePlayOptions(replay ? -1 : 0);
+    MIX_PlayTrack(track.get(), opts);
+    destroyPlayOptions(opts);
 
     return true;
 }

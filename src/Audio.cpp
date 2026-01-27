@@ -1,15 +1,14 @@
-#include "GlobalMeneger.hpp"
-#include "SDL3_mixer/SDL_mixer.h"
 #include <SDLWrapper/Audio/Audio.hpp>
+#include <SDLWrapper/SDL3GlobalMeneger.hpp>
 
 #include <SDL3/SDL_error.h>
+#include <SDL3_mixer/SDL_mixer.h>
 
 namespace sdl3::audio
 {
 
 Audio::Audio(std::size_t deviceID) : deviceID_(deviceID)
 {
-
 }
 
 void Audio::stop()
@@ -17,9 +16,9 @@ void Audio::stop()
     isRunning_ = false;
 }
 
-bool Audio::loadFromFile(const char* path, bool predecode)
+bool Audio::loadFromFile(const char *path, bool predecode)
 {
-    std::shared_ptr<MIX_Mixer> mixerS = GlobalMeneger::getMixer(deviceID_).lock();
+    std::shared_ptr<MIX_Mixer> mixerS = SDL3GlobalMeneger::getMixer(deviceID_).lock();
     if (!mixerS)
     {
         SDL_Log("There is no mixer to load the audio");
