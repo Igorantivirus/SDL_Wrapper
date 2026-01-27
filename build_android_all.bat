@@ -31,13 +31,13 @@ set "PRESET=%~1"
 set "INSTALL_SUFFIX=%~2"
 set "CMAKE_EXE=%~3"
 
-%CMAKE_EXE% --preset %PRESET%
+"%CMAKE_EXE%" --preset "%PRESET%"
 if errorlevel 1 exit /b %errorlevel%
 
 for %%C in (Debug Release) do (
-    %CMAKE_EXE% --build "build/%PRESET%" --config %%C
+    "%CMAKE_EXE%" --build "build/%PRESET%" --config %%C
     if errorlevel 1 exit /b %errorlevel%
-    %CMAKE_EXE% --install "build/%PRESET%" --config %%C --prefix "%INSTALL_BASE%/%INSTALL_SUFFIX%/%%C"
+    "%CMAKE_EXE%" --install "build/%PRESET%" --config %%C --prefix "%INSTALL_BASE%/%INSTALL_SUFFIX%/%%C"
     if errorlevel 1 exit /b %errorlevel%
 )
 
