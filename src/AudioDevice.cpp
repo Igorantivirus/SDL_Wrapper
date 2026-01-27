@@ -1,3 +1,4 @@
+#include "SDL3_mixer/SDL_mixer.h"
 #include <SDLWrapper/Audio/AudioDevice.hpp>
 
 #include <SDLWrapper/SDL3GlobalMeneger.hpp>
@@ -153,4 +154,10 @@ std::weak_ptr<MIX_Mixer> AudioDevice::getSDMixer()
 {
     return mixer_;
 }
+
+void AudioDevice::setVolumeLevel(const float value)
+{
+    MIX_SetMixerGain(mixer_.get(), value);
+}
+
 } // namespace sdl3::audio

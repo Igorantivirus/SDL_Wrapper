@@ -40,6 +40,8 @@ public:
 
     const std::size_t getDeviceID() const;
 
+    void setVolumeLevel(const float value);
+
 private:
     std::shared_ptr<MIX_Mixer> mixer_;
     std::vector<std::shared_ptr<MIX_Track>> freeTracks_;
