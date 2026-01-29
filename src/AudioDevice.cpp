@@ -1,3 +1,4 @@
+#include "SDL3/SDL_properties.h"
 #include "SDL3_mixer/SDL_mixer.h"
 #include <SDLWrapper/Audio/AudioDevice.hpp>
 
@@ -5,36 +6,31 @@
 
 #include <SDL3/SDL_error.h>
 
-// loops: 0 = no loop, 1 = loop once, -1 = infinite
-static SDL_PropertiesID makePlayOptions(int loops)
-{
-    if (loops == 0)
-    {
-        return 0; // "defaults for everything" :contentReference[oaicite:1]{index=1}
-    }
-
-    SDL_PropertiesID props = SDL_CreateProperties();
-    if (props == 0)
-    {
-        // SDL_GetError() если хочешь залогировать
-        return 0;
-    }
-
-    // MIX_PROP_PLAY_LOOPS_NUMBER: -1 infinite, 0 none, 1+ finite :contentReference[oaicite:2]{index=2}
-    SDL_SetNumberProperty(props, MIX_PROP_PLAY_LOOPS_NUMBER, loops);
-    return props;
-}
-
-static void destroyPlayOptions(SDL_PropertiesID props)
-{
-    if (props != 0)
-    {
-        SDL_DestroyProperties(props);
-    }
-}
-
 namespace sdl3::audio
 {
+
+bool AudioDevice::SoundPair::needDelete()
+{
+    if (!sound->running_)
+        return true;
+
+    auto &live = sound->getLiveControls();
+    if (lastSeenVersion != live.version_)
+    {
+        lastSeenVersion = live.version_;
+        live.setControlsToTrack(track);
+    }
+
+    if (appliedPaused != sound->paused_)
+    {
+        const bool ok = sound->paused_ ? MIX_PauseTrack(track.get()) : MIX_ResumeTrack(track.get());
+        if (!ok)
+            return true;
+        appliedPaused = sound->paused_;
+    }
+
+    return !MIX_TrackPlaying(track.get()) && !appliedPaused;
+}
 
 void AudioDevice::subscribe()
 {
@@ -92,28 +88,40 @@ bool AudioDevice::initTracks(const std::size_t tracksCount)
     return true;
 }
 
-bool AudioDevice::playSound(const Audio &audio, bool replay)
+bool AudioDevice::playSound(const Sound &sound, const PlayProperties properties)
 {
-    if (freeTracks_.empty() || !audio)
+    if (freeTracks_.empty() || !sound.getAudio())
         return false;
 
+    // Перемещение трека
     std::shared_ptr<MIX_Track> track = freeTracks_.back();
-    std::shared_ptr<const MIX_Audio> audioS = audio.getSDLAudio().lock();
 
-    AudioPair pair;
+    SoundPair pair;
     pair.track = track;
-    pair.audio = &audio;
-    pair.audio->startAudio();
+    pair.sound = &sound;
+    pair.lastSeenVersion = sound.getLiveControls().version_;
+    pair.appliedPaused = sound.paused_;
 
     freeTracks_.pop_back();
     usedTracks_.push_back(std::move(pair));
 
-    MIX_SetTrackAudio(track.get(), const_cast<MIX_Audio *>(audioS.get()));
-    MIX_SetTrackGain(track.get(), 1.0f);
+    // Запуск трека
+    std::shared_ptr<const MIX_Audio> audioS = sound.getAudio()->getSDLAudio().lock();
+    if (!audioS)
+        return false;
+    SDL_PropertiesID prop = PlayProperties::generateProperties(properties);
 
-    SDL_PropertiesID opts = makePlayOptions(replay ? -1 : 0);
-    MIX_PlayTrack(track.get(), opts);
-    destroyPlayOptions(opts);
+    MIX_SetTrackAudio(track.get(), const_cast<MIX_Audio *>(audioS.get()));
+    MIX_PlayTrack(track.get(), prop);
+    sound.getLiveControls().setControlsToTrack(track);
+    if (sound.paused_)
+    {
+        MIX_PauseTrack(track.get());
+    }
+
+    sound.running_ = true;
+    if (prop != 0)
+        SDL_DestroyProperties(prop);
 
     return true;
 }
@@ -122,13 +130,11 @@ std::size_t AudioDevice::update()
 {
     for (auto it = usedTracks_.begin(); it != usedTracks_.end();)
     {
-        // Если не проигрывается или был отключен
-        if (!MIX_TrackPlaying(it->track.get()) || !it->audio->isRunnig())
+        if (it->needDelete())
         {
-            it->audio->stopAudio();
+            it->sound->running_ = false;
             MIX_SetTrackAudio(it->track.get(), nullptr); // Отсоединяем звук
-
-            freeTracks_.push_back(it->track); // Возвращаем в пул свободных
+            freeTracks_.push_back(it->track);            // Возвращаем в пул свободных
             it = usedTracks_.erase(it);
         }
         else
@@ -158,6 +164,21 @@ std::weak_ptr<MIX_Mixer> AudioDevice::getSDMixer()
 void AudioDevice::setVolumeLevel(const float value)
 {
     MIX_SetMixerGain(mixer_.get(), value);
+}
+
+void AudioDevice::setStopedAll(const bool isStoped)
+{
+    if (isStoped == isStoped_)
+        return;
+    isStoped_ = isStoped;
+    if (isStoped)
+        MIX_PauseAllTracks(mixer_.get());
+    else
+        MIX_ResumeAllTracks(mixer_.get());
+}
+bool AudioDevice::isStopedAll() const
+{
+    return isStoped_;
 }
 
 } // namespace sdl3::audio

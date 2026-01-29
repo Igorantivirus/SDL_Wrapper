@@ -4,7 +4,8 @@
 #include <memory>
 #include <vector>
 
-#include "Audio.hpp"
+#include "Sound.hpp"
+#include "SoundSettings.hpp"
 
 namespace sdl3::audio
 {
@@ -12,11 +13,15 @@ namespace sdl3::audio
 class AudioDevice
 {
 private:
-    // Гарантия, что аудио будет жить, пока воспроизводится
-    struct AudioPair
+    // Р“Р°СЂР°РЅС‚РёСЏ, С‡С‚Рѕ Р°СѓРґРёРѕ Р±СѓРґРµС‚ Р¶РёС‚СЊ, РїРѕРєР° РІРѕСЃРїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ
+    struct SoundPair
     {
         std::shared_ptr<MIX_Track> track;
-        const Audio *audio;
+        const Sound *sound;
+        bool appliedPaused = false; // РєР°РєРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ РїР°СѓР·С‹ РјС‹ СѓР¶Рµ РїСЂРёРјРµРЅРёР»Рё Рє С‚СЂРµРєСѓ
+        unsigned lastSeenVersion = 0;
+
+        bool needDelete();
     };
 
 public:
@@ -28,7 +33,7 @@ public:
 
     bool initTracks(const std::size_t tracksCount);
 
-    bool playSound(const Audio &audio, bool replay = false);
+    bool playSound(const Sound &sound, const PlayProperties properties = PlayProperties::getDefaultProperties());
 
     std::size_t update();
 
@@ -42,10 +47,15 @@ public:
 
     void setVolumeLevel(const float value);
 
+    void setStopedAll(const bool isStoped);
+    bool isStopedAll() const;
+
 private:
+    bool isStoped_ = false;
+
     std::shared_ptr<MIX_Mixer> mixer_;
     std::vector<std::shared_ptr<MIX_Track>> freeTracks_;
-    std::list<AudioPair> usedTracks_;
+    std::list<SoundPair> usedTracks_;
 
     std::size_t deviceID_ = std::size_t(-1);
 
@@ -54,3 +64,4 @@ private:
     void unsubscribe();
 };
 } // namespace sdl3::audio
+

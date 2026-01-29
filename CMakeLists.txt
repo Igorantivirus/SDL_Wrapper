@@ -35,6 +35,8 @@ target_sources(SDLWrapper PRIVATE
     src/View.cpp
     src/Audio.cpp
     src/AudioDevice.cpp
+    src/Sound.cpp
+    src/SoundSettings.cpp
 )
 
 # Подключение заголовков (пути переданы из пресетов)
