@@ -1,10 +1,2 @@
-.vscode
-build
-
-.clang-format
-.clangd
-
-CMakePresets.json
-
-src/main.cpp
 build_all.bat
+build/
