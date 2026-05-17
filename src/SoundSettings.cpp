@@ -1,4 +1,4 @@
-#include <SDLWrapper/Audio/SoundSettings.hpp>
+#include <SDL_wrapper/Audio/SoundSettings.hpp>
 
 #include <cmath> // llround
 

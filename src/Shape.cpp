@@ -1,9 +1,9 @@
-#include <SDLWrapper/ObjectBase/Shape.hpp>
+#include <SDL_wrapper/ObjectBase/Shape.hpp>
 
 #include <cmath>
 
-#include <SDLWrapper/Renders/RenderTarget.hpp>
-#include <SDLWrapper/Texture.hpp>
+#include <SDL_wrapper/Renders/RenderTarget.hpp>
+#include <SDL_wrapper/Texture.hpp>
 
 namespace sdl3
 {

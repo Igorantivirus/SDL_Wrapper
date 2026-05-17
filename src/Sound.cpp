@@ -1,4 +1,4 @@
-#include <SDLWrapper/Audio/Sound.hpp>
+#include <SDL_wrapper/Audio/Sound.hpp>
 
 #include <utility>
 

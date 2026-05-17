@@ -1,6 +1,6 @@
-#include <SDLWrapper/Renders/RenderWindow.hpp>
-#include <SDLWrapper/Renders/View.hpp>
-#include <SDLWrapper/SDL3GlobalMeneger.hpp>
+#include <SDL_wrapper/Renders/RenderWindow.hpp>
+#include <SDL_wrapper/Renders/View.hpp>
+#include <SDL_wrapper/SDL3GlobalMeneger.hpp>
 
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_log.h>

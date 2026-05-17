@@ -1,4 +1,4 @@
-#include <SDLWrapper/DrawTransformObjects/EllipseShape.hpp>
+#include <SDL_wrapper/DrawTransformObjects/EllipseShape.hpp>
 
 #include <cmath>
 

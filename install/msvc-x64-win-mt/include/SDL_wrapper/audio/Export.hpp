@@ -1,0 +1,43 @@
+
+#ifndef SDL_WRAPPER_AUDIO_EXPORT_HPP
+#define SDL_WRAPPER_AUDIO_EXPORT_HPP
+
+#ifdef SDL_WRAPPER_AUDIO_STATIC_DEFINE
+#  define SDL_WRAPPER_AUDIO_EXPORT
+#  define SDL_WRAPPER_AUDIO_NO_EXPORT
+#else
+#  ifndef SDL_WRAPPER_AUDIO_EXPORT
+#    ifdef SDL_wrapper_audio_EXPORTS
+        /* We are building this library */
+#      define SDL_WRAPPER_AUDIO_EXPORT 
+#    else
+        /* We are using this library */
+#      define SDL_WRAPPER_AUDIO_EXPORT 
+#    endif
+#  endif
+
+#  ifndef SDL_WRAPPER_AUDIO_NO_EXPORT
+#    define SDL_WRAPPER_AUDIO_NO_EXPORT 
+#  endif
+#endif
+
+#ifndef SDL_WRAPPER_AUDIO_DEPRECATED
+#  define SDL_WRAPPER_AUDIO_DEPRECATED __declspec(deprecated)
+#endif
+
+#ifndef SDL_WRAPPER_AUDIO_DEPRECATED_EXPORT
+#  define SDL_WRAPPER_AUDIO_DEPRECATED_EXPORT SDL_WRAPPER_AUDIO_EXPORT SDL_WRAPPER_AUDIO_DEPRECATED
+#endif
+
+#ifndef SDL_WRAPPER_AUDIO_DEPRECATED_NO_EXPORT
+#  define SDL_WRAPPER_AUDIO_DEPRECATED_NO_EXPORT SDL_WRAPPER_AUDIO_NO_EXPORT SDL_WRAPPER_AUDIO_DEPRECATED
+#endif
+
+/* NOLINTNEXTLINE(readability-avoid-unconditional-preprocessor-if) */
+#if 0 /* DEFINE_NO_DEPRECATED */
+#  ifndef SDL_WRAPPER_AUDIO_NO_DEPRECATED
+#    define SDL_WRAPPER_AUDIO_NO_DEPRECATED
+#  endif
+#endif
+
+#endif /* SDL_WRAPPER_AUDIO_EXPORT_HPP */

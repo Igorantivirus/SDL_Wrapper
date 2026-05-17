@@ -1,12 +1,12 @@
 #include "SDL3/SDL_pixels.h"
-#include <SDLWrapper/Renders/RenderTarget.hpp>
+#include <SDL_wrapper/Renders/RenderTarget.hpp>
 
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_log.h>
 #include <SDL3/SDL_render.h>
 
-#include <SDLWrapper/ObjectBase/Drawable.hpp>
-#include <SDLWrapper/Texture.hpp>
+#include <SDL_wrapper/ObjectBase/Drawable.hpp>
+#include <SDL_wrapper/Texture.hpp>
 
 SDL_Texture *getRawTextureFromTexture(const sdl3::Texture *texture)
 {

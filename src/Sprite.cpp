@@ -1,7 +1,7 @@
-#include <SDLWrapper/DrawTransformObjects/Sprite.hpp>
+#include <SDL_wrapper/DrawTransformObjects/Sprite.hpp>
 
-#include <SDLWrapper/Renders/RenderTarget.hpp>
-#include <SDLWrapper/Texture.hpp>
+#include <SDL_wrapper/Renders/RenderTarget.hpp>
+#include <SDL_wrapper/Texture.hpp>
 
 namespace sdl3
 {

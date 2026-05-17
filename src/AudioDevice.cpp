@@ -1,8 +1,9 @@
 #include "SDL3/SDL_properties.h"
 #include "SDL3_mixer/SDL_mixer.h"
-#include <SDLWrapper/Audio/AudioDevice.hpp>
+#include "SDL_wrapper/Audio/SDL3MixerMeneger.hpp"
+#include <SDL_wrapper/Audio/AudioDevice.hpp>
 
-#include <SDLWrapper/SDL3GlobalMeneger.hpp>
+#include <SDL_wrapper/SDL3GlobalMeneger.hpp>
 
 #include <SDL3/SDL_error.h>
 
@@ -34,12 +35,12 @@ bool AudioDevice::SoundPair::needDelete()
 
 void AudioDevice::subscribe()
 {
-    deviceID_ = SDL3GlobalMeneger::subscribeMixer(mixer_);
+    deviceID_ = SDL3MixerMeneger::subscribeMixer(mixer_);
 }
 
 void AudioDevice::unsubscribe()
 {
-    SDL3GlobalMeneger::unsubscribeMixer(deviceID_);
+    SDL3MixerMeneger::unsubscribeMixer(deviceID_);
     deviceID_ = SDL3GlobalMeneger::invalidID;
 }
 

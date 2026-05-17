@@ -1,4 +1,4 @@
-#include <SDLWrapper/DrawTransformObjects/CircleShape.hpp>
+#include <SDL_wrapper/DrawTransformObjects/CircleShape.hpp>
 
 #include <cmath>
 

@@ -1,4 +1,4 @@
-#include <SDLWrapper/ObjectBase/Transformable.hpp>
+#include <SDL_wrapper/ObjectBase/Transformable.hpp>
 
 #include <cmath>
 

@@ -1,5 +1,5 @@
-#include <SDLWrapper/SDL3GlobalMeneger.hpp>
-#include <SDLWrapper/Texture.hpp>
+#include <SDL_wrapper/SDL3GlobalMeneger.hpp>
+#include <SDL_wrapper/Texture.hpp>
 
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_log.h>
