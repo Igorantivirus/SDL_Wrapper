@@ -1,0 +1,105 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "Win-BuildTools",
+      "inherits": "msvc-x64-win-mt",
+      "installDir": "${sourceDir}/install/msvc-x64-win-mt",
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "${env.LIBS_ROOT}/install/SDL-release-3.4.2/msvc-x64-win-mt;${env.LIBS_ROOT}/install/SDL_image-release-3.4.0/msvc-x64-win-mt;${env.LIBS_ROOT}/install/SDL_mixer-release-3.2.0/msvc-x64-win-mt"
+      }
+    },
+    {
+      "name": "Win-VS22",
+      "inherits": "msvc-x64-win-mt",
+      "environment": {
+        "PATH": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.41.34120/bin/Hostx64/x64;C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x64;$penv{PATH}",
+        "INCLUDE": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.41.34120/include;C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/ucrt;C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/um;C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/shared;C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/winrt;C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/cppwinrt;$penv{INCLUDE}",
+        "LIB": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.41.34120/lib/x64;C:/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0/ucrt/x64;C:/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0/um/x64;$penv{LIB}"
+      },
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "${env.LIBS_ROOT}/..."
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "Debug-BT",
+      "configurePreset": "Win-BuildTools",
+      "configuration": "Debug"
+    },
+    {
+      "name": "Release-BT",
+      "configurePreset": "Win-BuildTools",
+      "configuration": "Release"
+    },
+    {
+      "name": "MinSizeRel-BT",
+      "configurePreset": "Win-BuildTools",
+      "configuration": "MinSizeRel"
+    },
+    {
+      "name": "Debug-BT-install",
+      "configurePreset": "Win-BuildTools",
+      "configuration": "Debug",
+      "targets": [
+        "install"
+      ]
+    },
+    {
+      "name": "Release-BT-install",
+      "configurePreset": "Win-BuildTools",
+      "configuration": "Release",
+      "targets": [
+        "install"
+      ]
+    },
+    {
+      "name": "MinSizeRel-BT-install",
+      "configurePreset": "Win-BuildTools",
+      "configuration": "MinSizeRel",
+      "targets": [
+        "install"
+      ]
+    },
+    {
+      "name": "Debug-VS22",
+      "configurePreset": "Win-VS22",
+      "configuration": "Debug"
+    },
+    {
+      "name": "Release-VS22",
+      "configurePreset": "Win-VS22",
+      "configuration": "Release"
+    },
+    {
+      "name": "MinSizeRel-VS22",
+      "configurePreset": "Win-VS22",
+      "configuration": "MinSizeRel"
+    },
+    {
+      "name": "Debug-VS22-install",
+      "configurePreset": "Win-VS22",
+      "configuration": "Debug",
+      "targets": [
+        "install"
+      ]
+    },
+    {
+      "name": "Release-VS22-install",
+      "configurePreset": "Win-VS22",
+      "configuration": "Release",
+      "targets": [
+        "install"
+      ]
+    },
+    {
+      "name": "MinSizeRel-VS22-install",
+      "configurePreset": "Win-VS22",
+      "configuration": "MinSizeRel",
+      "targets": [
+        "install"
+      ]
+    }
+  ]
+}
