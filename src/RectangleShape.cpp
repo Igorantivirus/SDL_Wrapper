@@ -1,4 +1,4 @@
-#include <SDL_wrapper/DrawTransformObjects/RectangleShape.hpp>
+#include <SDL_wrapper/Graphics/DrawTransformObjects/RectangleShape.hpp>
 
 namespace sdl3
 {

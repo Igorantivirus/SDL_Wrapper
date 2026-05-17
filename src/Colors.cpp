@@ -1,4 +1,4 @@
-#include <SDL_wrapper/Math/Colors.hpp>
+#include <SDL_wrapper/Core/Math/Colors.hpp>
 
 namespace sdl3
 {

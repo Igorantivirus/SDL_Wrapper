@@ -19,7 +19,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_cmake_targets_defined "")
 set(_cmake_targets_not_defined "")
 set(_cmake_expected_targets "")
-foreach(_cmake_expected_target IN ITEMS SDL_wrapper::graphics SDL_wrapper::audio)
+foreach(_cmake_expected_target IN ITEMS SDL_wrapper::Core SDL_wrapper::Graphics SDL_wrapper::Mixer)
   list(APPEND _cmake_expected_targets "${_cmake_expected_target}")
   if(TARGET "${_cmake_expected_target}")
     list(APPEND _cmake_targets_defined "${_cmake_expected_target}")
@@ -55,47 +55,70 @@ if(_IMPORT_PREFIX STREQUAL "/")
   set(_IMPORT_PREFIX "")
 endif()
 
-# Create imported target SDL_wrapper::graphics
-add_library(SDL_wrapper::graphics STATIC IMPORTED)
+# Create imported target SDL_wrapper::Core
+add_library(SDL_wrapper::Core STATIC IMPORTED)
 
-set_target_properties(SDL_wrapper::graphics PROPERTIES
+set_target_properties(SDL_wrapper::Core PROPERTIES
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
-  INTERFACE_LINK_LIBRARIES "SDL3::SDL3-static;SDL3_image::SDL3_image-static"
+  INTERFACE_LINK_LIBRARIES "SDL3::SDL3-static"
 )
 
 if(NOT CMAKE_VERSION VERSION_LESS "3.23.0")
-  target_sources(SDL_wrapper::graphics
+  target_sources(SDL_wrapper::Core
     INTERFACE
       FILE_SET "generated_headers"
       TYPE "HEADERS"
       BASE_DIRS "${_IMPORT_PREFIX}/include"
-      FILES "${_IMPORT_PREFIX}/include/SDL_wrapper/graphics/Export.hpp"
+      FILES "${_IMPORT_PREFIX}/include/SDL_wrapper/Core/Export.hpp"
   )
 else()
-  set_property(TARGET SDL_wrapper::graphics
+  set_property(TARGET SDL_wrapper::Core
     APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES
       "${_IMPORT_PREFIX}/include"
   )
 endif()
 
-# Create imported target SDL_wrapper::audio
-add_library(SDL_wrapper::audio STATIC IMPORTED)
+# Create imported target SDL_wrapper::Graphics
+add_library(SDL_wrapper::Graphics STATIC IMPORTED)
 
-set_target_properties(SDL_wrapper::audio PROPERTIES
+set_target_properties(SDL_wrapper::Graphics PROPERTIES
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
-  INTERFACE_LINK_LIBRARIES "SDL3_mixer::SDL3_mixer-static;SDL_wrapper::graphics"
+  INTERFACE_LINK_LIBRARIES "SDL_wrapper::Core;SDL3_image::SDL3_image-static"
 )
 
 if(NOT CMAKE_VERSION VERSION_LESS "3.23.0")
-  target_sources(SDL_wrapper::audio
+  target_sources(SDL_wrapper::Graphics
     INTERFACE
       FILE_SET "generated_headers"
       TYPE "HEADERS"
       BASE_DIRS "${_IMPORT_PREFIX}/include"
-      FILES "${_IMPORT_PREFIX}/include/SDL_wrapper/audio/Export.hpp"
+      FILES "${_IMPORT_PREFIX}/include/SDL_wrapper/Graphics/Export.hpp"
   )
 else()
-  set_property(TARGET SDL_wrapper::audio
+  set_property(TARGET SDL_wrapper::Graphics
+    APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES
+      "${_IMPORT_PREFIX}/include"
+  )
+endif()
+
+# Create imported target SDL_wrapper::Mixer
+add_library(SDL_wrapper::Mixer STATIC IMPORTED)
+
+set_target_properties(SDL_wrapper::Mixer PROPERTIES
+  INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
+  INTERFACE_LINK_LIBRARIES "SDL_wrapper::Core;SDL3_mixer::SDL3_mixer-static"
+)
+
+if(NOT CMAKE_VERSION VERSION_LESS "3.23.0")
+  target_sources(SDL_wrapper::Mixer
+    INTERFACE
+      FILE_SET "generated_headers"
+      TYPE "HEADERS"
+      BASE_DIRS "${_IMPORT_PREFIX}/include"
+      FILES "${_IMPORT_PREFIX}/include/SDL_wrapper/Mixer/Export.hpp"
+  )
+else()
+  set_property(TARGET SDL_wrapper::Mixer
     APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES
       "${_IMPORT_PREFIX}/include"
   )

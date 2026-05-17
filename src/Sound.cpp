@@ -1,8 +1,8 @@
-#include <SDL_wrapper/Audio/Sound.hpp>
+#include <SDL_wrapper/Mixer/Sound.hpp>
 
 #include <utility>
 
-namespace sdl3::audio
+namespace sdl3::mixer
 {
 
 void Sound::setAudio(const Audio &audio)
@@ -46,4 +46,4 @@ void Sound::stop()
     running_ = false;
 }
 
-} // namespace sdl3::audio
+} // namespace sdl3::mixer

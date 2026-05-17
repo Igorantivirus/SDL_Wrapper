@@ -2,25 +2,38 @@ cmake_minimum_required(VERSION 3.25)
 
 project(SDL_wrapper VERSION 0.1.0 LANGUAGES CXX)
 
-# ===================================================
-# ==================== НАСТРОЙКА ====================
-# ===================================================
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
-set(CPP_GRAPHICS_FILES
-    src/CircleShape.cpp
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
+include(GenerateExportHeader)
+
+find_package(SDL3 CONFIG REQUIRED)
+find_package(SDL3_image CONFIG REQUIRED)
+find_package(SDL3_mixer CONFIG REQUIRED)
+
+if(TARGET SDL3::SDL3-static)
+    set(SDL_WRAPPER_SDL3_TARGET SDL3::SDL3-static)
+else()
+    set(SDL_WRAPPER_SDL3_TARGET SDL3::SDL3)
+endif()
+
+set(SDL_WRAPPER_CORE_FILES
     src/Clock.cpp
     src/Colors.cpp
-    src/EllipseShape.cpp
     src/FileWorker.cpp
+)
+
+set(SDL_WRAPPER_GRAPHICS_FILES
+    src/CircleShape.cpp
+    src/EllipseShape.cpp
     src/PolygonShape.cpp
     src/RectangleShape.cpp
+    src/RendererRegistry.cpp
     src/RenderTarget.cpp
     src/RenderWindow.cpp
-    src/SDL3GlobalMeneger.cpp
     src/Shape.cpp
     src/Sprite.cpp
     src/Texture.cpp
@@ -29,28 +42,21 @@ set(CPP_GRAPHICS_FILES
     src/View.cpp
 )
 
-set(CPP_AUDIO_FILES
+set(SDL_WRAPPER_MIXER_FILES
     src/Audio.cpp
     src/AudioDevice.cpp
+    src/MixerRegistry.cpp
     src/Sound.cpp
     src/SoundSettings.cpp
-    src/SDL3MixerMeneger.cpp
 )
 
 set(SDL_WRAPPER_TARGETS
-    SDL_wrapper-graphics
-    SDL_wrapper-audio
+    SDL_wrapper-Core
+    SDL_wrapper-Graphics
+    SDL_wrapper-Mixer
 )
 
-# ===================================================
-# ============ ПОДКЛЮЧЕНИЕ ЗАВИСИМОСТЕЙ =============
-# ===================================================
-
-include(CMakePackageConfigHelpers)
-include(GNUInstallDirs)
-include(GenerateExportHeader)
-
-function(SDL_wrapper_generate_export_header target macro_name export_header_subdir)
+function(sdl_wrapper_generate_export_header target macro_name export_header_subdir)
     set(export_header
         "${CMAKE_CURRENT_BINARY_DIR}/generated/include/SDL_wrapper/${export_header_subdir}/Export.hpp"
     )
@@ -77,66 +83,51 @@ function(SDL_wrapper_generate_export_header target macro_name export_header_subd
     )
 endfunction()
 
-find_package(SDL3 CONFIG REQUIRED)
-find_package(SDL3_image CONFIG REQUIRED)
-find_package(SDL3_mixer CONFIG REQUIRED)
-
-# ===================================================
-# =============== СОЗДАНИЕ БИНАРНИКОВ ===============
-# ===================================================
-
-add_library(SDL_wrapper-graphics ${CPP_GRAPHICS_FILES})
-add_library(SDL_wrapper-audio ${CPP_AUDIO_FILES})
-
-SDL_wrapper_generate_export_header(SDL_wrapper-graphics SDL_WRAPPER_GRAPHICS graphics)
-SDL_wrapper_generate_export_header(SDL_wrapper-audio SDL_WRAPPER_AUDIO audio)
-
-add_library(SDL_wrapper::Graphics ALIAS SDL_wrapper-graphics)
-add_library(SDL_wrapper::Audio ALIAS SDL_wrapper-audio)
-
-# ===================================================
-# ================= TARGET НАСТРОЙКА ================
-# ===================================================
-
-# =================== ОБЩИЙ TARGET ==================
-
-foreach(target ${SDL_WRAPPER_TARGETS})
+function(sdl_wrapper_setup_target target export_name)
     set_target_properties(${target} PROPERTIES
         CXX_STANDARD 23
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS OFF
         DEBUG_POSTFIX "-d"
+        EXPORT_NAME ${export_name}
+        FOLDER "Libraries"
     )
+
     target_include_directories(${target} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     )
-    string(REPLACE "SDL_wrapper-" "" SHORT_NAME ${target})
-    set_target_properties(${target} PROPERTIES EXPORT_NAME ${SHORT_NAME})
-    set_target_properties(${target} PROPERTIES FOLDER "Libraries")
-endforeach()
+endfunction()
 
-if(TARGET SDL3::SDL3-static)
-    target_link_libraries(SDL_wrapper-graphics PUBLIC
-        SDL3::SDL3-static
-        SDL3_image::SDL3_image
-    )
-else()
-    target_link_libraries(SDL_wrapper-graphics PUBLIC
-        SDL3::SDL3
-        SDL3_image::SDL3_image
-    )
-endif()
+add_library(SDL_wrapper-Core ${SDL_WRAPPER_CORE_FILES})
+add_library(SDL_wrapper-Graphics ${SDL_WRAPPER_GRAPHICS_FILES})
+add_library(SDL_wrapper-Mixer ${SDL_WRAPPER_MIXER_FILES})
 
-target_link_libraries(SDL_wrapper-audio PUBLIC SDL3_mixer::SDL3_mixer)
+add_library(SDL_wrapper::Core ALIAS SDL_wrapper-Core)
+add_library(SDL_wrapper::Graphics ALIAS SDL_wrapper-Graphics)
+add_library(SDL_wrapper::Mixer ALIAS SDL_wrapper-Mixer)
 
-# ================== TARGET МОДУЛЕЙ =================
+sdl_wrapper_setup_target(SDL_wrapper-Core Core)
+sdl_wrapper_setup_target(SDL_wrapper-Graphics Graphics)
+sdl_wrapper_setup_target(SDL_wrapper-Mixer Mixer)
 
-target_link_libraries(SDL_wrapper-audio PUBLIC SDL_wrapper-graphics)
+sdl_wrapper_generate_export_header(SDL_wrapper-Core SDL_WRAPPER_CORE Core)
+sdl_wrapper_generate_export_header(SDL_wrapper-Graphics SDL_WRAPPER_GRAPHICS Graphics)
+sdl_wrapper_generate_export_header(SDL_wrapper-Mixer SDL_WRAPPER_MIXER Mixer)
 
-# ===================================================
-# ================ INSTALL БИБЛИОТЕКИ ===============
-# ===================================================
+target_link_libraries(SDL_wrapper-Core PUBLIC
+    ${SDL_WRAPPER_SDL3_TARGET}
+)
+
+target_link_libraries(SDL_wrapper-Graphics PUBLIC
+    SDL_wrapper-Core
+    SDL3_image::SDL3_image
+)
+
+target_link_libraries(SDL_wrapper-Mixer PUBLIC
+    SDL_wrapper-Core
+    SDL3_mixer::SDL3_mixer
+)
 
 install(TARGETS ${SDL_WRAPPER_TARGETS}
     EXPORT SDL_wrapperTargets
@@ -145,7 +136,7 @@ install(TARGETS ${SDL_WRAPPER_TARGETS}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 
     FILE_SET generated_headers
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/"

@@ -1,12 +1,12 @@
-#include <SDL_wrapper/Renders/RenderWindow.hpp>
-#include <SDL_wrapper/Renders/View.hpp>
-#include <SDL_wrapper/SDL3GlobalMeneger.hpp>
-
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_log.h>
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_video.h>
 #include <SDL3_image/SDL_image.h>
+
+#include <SDL_wrapper/Graphics/Detail/RendererRegistry.hpp>
+#include <SDL_wrapper/Graphics/Renders/RenderWindow.hpp>
+#include <SDL_wrapper/Graphics/Renders/View.hpp>
 
 struct Deleterer
 {
@@ -134,13 +134,13 @@ float RenderWindow::getPixelDensity() const
 
 void RenderWindow::subscribe()
 {
-    windowID_ = SDL3GlobalMeneger::subscribeRenderer(renderer_);
+    windowID_ = detail::RendererRegistry::subscribeRenderer(renderer_);
 }
 
 void RenderWindow::unsubscribe()
 {
-    SDL3GlobalMeneger::unsubscribeRenderer(windowID_);
-    windowID_ = SDL3GlobalMeneger::invalidID;
+    detail::RendererRegistry::unsubscribeRenderer(windowID_);
+    windowID_ = detail::RendererRegistry::invalidID;
 }
 
 Vector2i RenderWindow::getSize() const

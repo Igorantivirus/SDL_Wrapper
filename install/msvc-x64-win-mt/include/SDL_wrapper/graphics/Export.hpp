@@ -7,7 +7,7 @@
 #  define SDL_WRAPPER_GRAPHICS_NO_EXPORT
 #else
 #  ifndef SDL_WRAPPER_GRAPHICS_EXPORT
-#    ifdef SDL_wrapper_graphics_EXPORTS
+#    ifdef SDL_wrapper_Graphics_EXPORTS
         /* We are building this library */
 #      define SDL_WRAPPER_GRAPHICS_EXPORT 
 #    else

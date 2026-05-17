@@ -1,4 +1,4 @@
-#include <SDL_wrapper/Clock.hpp>
+#include <SDL_wrapper/Core/Clock.hpp>
 
 #include <SDL3/SDL_timer.h>
 

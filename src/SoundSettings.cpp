@@ -1,8 +1,8 @@
-#include <SDL_wrapper/Audio/SoundSettings.hpp>
+#include <SDL_wrapper/Mixer/SoundSettings.hpp>
 
 #include <cmath> // llround
 
-namespace sdl3::audio
+namespace sdl3::mixer
 {
 
 PlayProperties PlayProperties::getDefaultProperties()
@@ -126,5 +126,5 @@ void LiveControls::setControlsToTrack(std::shared_ptr<MIX_Track> track) const
     MIX_SetTrackStereo(rtrack, &stereo);
 }
 
-} // namespace sdl3::audio
+} // namespace sdl3::mixer
 

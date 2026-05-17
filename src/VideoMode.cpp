@@ -1,5 +1,5 @@
+#include <SDL_wrapper/Graphics/Renders/VideoMode.hpp>
 #include <SDL3/SDL_error.h>
-#include <SDL_wrapper/Renders/VideoMode.hpp>
 
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_log.h>

@@ -1,4 +1,4 @@
-#include <SDL_wrapper/Renders/View.hpp>
+#include <SDL_wrapper/Graphics/Renders/View.hpp>
 
 #include <cmath>
 

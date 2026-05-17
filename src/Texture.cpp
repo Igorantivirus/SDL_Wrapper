@@ -1,5 +1,5 @@
-#include <SDL_wrapper/SDL3GlobalMeneger.hpp>
-#include <SDL_wrapper/Texture.hpp>
+#include <SDL_wrapper/Graphics/Detail/RendererRegistry.hpp>
+#include <SDL_wrapper/Graphics/Texture.hpp>
 
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_log.h>
@@ -25,7 +25,7 @@ Texture::Texture(const std::size_t windowID) : windowID_(windowID)
 bool Texture::loadFromFile(const char *fileName)
 {
     clear();
-    std::shared_ptr<SDL_Renderer> rendererS = SDL3GlobalMeneger::getRenderer(windowID_).lock();
+    std::shared_ptr<SDL_Renderer> rendererS = detail::RendererRegistry::getRenderer(windowID_).lock();
     if (!rendererS)
     {
         SDL_Log("There is no renderer to open the texture");

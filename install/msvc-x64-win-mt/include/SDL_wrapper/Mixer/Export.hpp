@@ -1,0 +1,43 @@
+
+#ifndef SDL_WRAPPER_MIXER_EXPORT_HPP
+#define SDL_WRAPPER_MIXER_EXPORT_HPP
+
+#ifdef SDL_WRAPPER_MIXER_STATIC_DEFINE
+#  define SDL_WRAPPER_MIXER_EXPORT
+#  define SDL_WRAPPER_MIXER_NO_EXPORT
+#else
+#  ifndef SDL_WRAPPER_MIXER_EXPORT
+#    ifdef SDL_wrapper_Mixer_EXPORTS
+        /* We are building this library */
+#      define SDL_WRAPPER_MIXER_EXPORT 
+#    else
+        /* We are using this library */
+#      define SDL_WRAPPER_MIXER_EXPORT 
+#    endif
+#  endif
+
+#  ifndef SDL_WRAPPER_MIXER_NO_EXPORT
+#    define SDL_WRAPPER_MIXER_NO_EXPORT 
+#  endif
+#endif
+
+#ifndef SDL_WRAPPER_MIXER_DEPRECATED
+#  define SDL_WRAPPER_MIXER_DEPRECATED __declspec(deprecated)
+#endif
+
+#ifndef SDL_WRAPPER_MIXER_DEPRECATED_EXPORT
+#  define SDL_WRAPPER_MIXER_DEPRECATED_EXPORT SDL_WRAPPER_MIXER_EXPORT SDL_WRAPPER_MIXER_DEPRECATED
+#endif
+
+#ifndef SDL_WRAPPER_MIXER_DEPRECATED_NO_EXPORT
+#  define SDL_WRAPPER_MIXER_DEPRECATED_NO_EXPORT SDL_WRAPPER_MIXER_NO_EXPORT SDL_WRAPPER_MIXER_DEPRECATED
+#endif
+
+/* NOLINTNEXTLINE(readability-avoid-unconditional-preprocessor-if) */
+#if 0 /* DEFINE_NO_DEPRECATED */
+#  ifndef SDL_WRAPPER_MIXER_NO_DEPRECATED
+#    define SDL_WRAPPER_MIXER_NO_DEPRECATED
+#  endif
+#endif
+
+#endif /* SDL_WRAPPER_MIXER_EXPORT_HPP */

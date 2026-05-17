@@ -1,4 +1,6 @@
-#include <SDL_wrapper/FileWorker.hpp>
+#include <SDL_wrapper/Core/FileWorker.hpp>
+
+#include <cstring>
 
 static void fillMode(char modeStr[4], const sdl3::FileWorkerMode fmode)
 {

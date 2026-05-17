@@ -1,13 +1,11 @@
-#include "SDL3/SDL_properties.h"
-#include "SDL3_mixer/SDL_mixer.h"
-#include "SDL_wrapper/Audio/SDL3MixerMeneger.hpp"
-#include <SDL_wrapper/Audio/AudioDevice.hpp>
-
-#include <SDL_wrapper/SDL3GlobalMeneger.hpp>
+#include <SDL3/SDL_properties.h>
+#include <SDL3_mixer/SDL_mixer.h>
+#include <SDL_wrapper/Mixer/Detail/MixerRegistry.hpp>
+#include <SDL_wrapper/Mixer/AudioDevice.hpp>
 
 #include <SDL3/SDL_error.h>
 
-namespace sdl3::audio
+namespace sdl3::mixer
 {
 
 bool AudioDevice::SoundPair::needDelete()
@@ -35,13 +33,13 @@ bool AudioDevice::SoundPair::needDelete()
 
 void AudioDevice::subscribe()
 {
-    deviceID_ = SDL3MixerMeneger::subscribeMixer(mixer_);
+    deviceID_ = detail::MixerRegistry::subscribeMixer(mixer_);
 }
 
 void AudioDevice::unsubscribe()
 {
-    SDL3MixerMeneger::unsubscribeMixer(deviceID_);
-    deviceID_ = SDL3GlobalMeneger::invalidID;
+    detail::MixerRegistry::unsubscribeMixer(deviceID_);
+    deviceID_ = detail::MixerRegistry::invalidID;
 }
 
 const std::size_t AudioDevice::getDeviceID() const
@@ -182,4 +180,4 @@ bool AudioDevice::isStopedAll() const
     return isStoped_;
 }
 
-} // namespace sdl3::audio
+} // namespace sdl3::mixer

@@ -2,10 +2,36 @@
 
 include(CMakeFindDependencyMacro)
 
+set(SDL_wrapper_SUPPORTED_COMPONENTS Core Graphics Mixer)
+
+if(NOT SDL_wrapper_FIND_COMPONENTS)
+    set(SDL_wrapper_FIND_COMPONENTS Core Graphics Mixer)
+endif()
+
 find_dependency(SDL3 CONFIG)
-find_dependency(SDL3_image CONFIG)
-find_dependency(SDL3_mixer CONFIG)
+
+if(Graphics IN_LIST SDL_wrapper_FIND_COMPONENTS)
+    find_dependency(SDL3_image CONFIG)
+endif()
+
+if(Mixer IN_LIST SDL_wrapper_FIND_COMPONENTS)
+    find_dependency(SDL3_mixer CONFIG)
+endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/SDL_wrapperTargets.cmake")
+
+foreach(component IN LISTS SDL_wrapper_FIND_COMPONENTS)
+    if(NOT component IN_LIST SDL_wrapper_SUPPORTED_COMPONENTS)
+        set(SDL_wrapper_FOUND FALSE)
+        set(SDL_wrapper_NOT_FOUND_MESSAGE "Unsupported SDL_wrapper component: ${component}")
+        return()
+    endif()
+
+    if(TARGET SDL_wrapper::${component})
+        set(SDL_wrapper_${component}_FOUND TRUE)
+    else()
+        set(SDL_wrapper_${component}_FOUND FALSE)
+    endif()
+endforeach()
 
 check_required_components(SDL_wrapper)

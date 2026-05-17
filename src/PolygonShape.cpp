@@ -1,4 +1,4 @@
-#include <SDL_wrapper/DrawTransformObjects/PolygonShape.hpp>
+#include <SDL_wrapper/Graphics/DrawTransformObjects/PolygonShape.hpp>
 
 namespace sdl3
 {
