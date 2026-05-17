@@ -1,0 +1,29 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "CMake: Clean build dir",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-E",
+                "rm",
+                "-rf",
+                "build"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "CMake: Clean install dir",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-E",
+                "rm",
+                "-rf",
+                "install"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}
